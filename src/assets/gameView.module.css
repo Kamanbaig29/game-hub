@@ -21,8 +21,8 @@
 
 /* FIXED Game Player - Let Unity control its own size */
 .playerWrapper {
-  width: 800px;
-  height: 800px;
+  width: 600px;
+  height: 600px;
   /* width: 1920px; */
   /* height: 1080px; */
   background: #000;

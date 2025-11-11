@@ -92,11 +92,11 @@ export default function GameView() {
           />
         </div>
 
-        <div className={styles.info}>
+        {/* <div className={styles.info}>
           <h1 className={styles.title}>{game.title}</h1>
           <p className={styles.description}>{game.description}</p>
           <Link to="/" className={styles.backBtn}>Back to Games</Link>
-        </div>
+        </div> */}
       </div>
     </div>
   );
