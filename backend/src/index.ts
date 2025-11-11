@@ -13,9 +13,15 @@ const PORT = process.env.PORT;
 // Connect to MongoDB
 connectDB();
 
-app.use(cors());
-app.use(express.json());
-app.use('/src/uploads', express.static('src/uploads'));
+app.use(cors({
+  origin: ['https://gamehub.memehome.io', 'http://localhost:5173'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
+app.use('/src/uploads', express.static(path.join(__dirname, '../src/uploads')));
 
 // API routes first
 app.use('/api/games', gameRoutes);
@@ -25,7 +31,11 @@ app.use(express.static(path.join(__dirname, '../../dist')));
 
 // Catch-all route for SPA (must be last)
 app.get('*', (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, '../../dist/index.html'));
+  // Don't serve index.html for upload paths
+  if (req.path.startsWith('/src/uploads/')) {
+    return res.status(404).send('File not found');
+  }
+  res.sendFile(path.join(__dirname, '../../../dist/index.html'));
 });
 
 app.listen(PORT, () => {
