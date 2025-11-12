@@ -13,15 +13,30 @@ const PORT = process.env.PORT;
 // Connect to MongoDB
 connectDB();
 
-app.use(cors({
-  origin: ['https://gamehub.memehome.io', 'http://localhost:5173'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// CORS handled by nginx
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
-app.use('/src/uploads', express.static(path.join(__dirname, '../src/uploads')));
+app.use('/src/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, filePath) => {
+    // Set proper MIME types for Unity files
+    if (filePath.endsWith('.wasm')) {
+      res.setHeader('Content-Type', 'application/wasm');
+    } else if (filePath.endsWith('.data')) {
+      res.setHeader('Content-Type', 'application/octet-stream');
+    } else if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (filePath.endsWith('.br')) {
+      res.setHeader('Content-Encoding', 'br');
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+    
+    // Enable aggressive caching for Unity files
+    if (filePath.match(/\.(wasm|data|js|symbols\.json|br)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.setHeader('Vary', 'Accept-Encoding');
+    }
+  }
+}));
 
 // API routes first
 app.use('/api/games', gameRoutes);
@@ -31,9 +46,9 @@ app.use(express.static(path.join(__dirname, '../../dist')));
 
 // Catch-all route for SPA (must be last)
 app.get('*', (req: Request, res: Response) => {
-  // Don't serve index.html for upload paths
-  if (req.path.startsWith('/src/uploads/')) {
-    return res.status(404).send('File not found');
+  // Don't serve index.html for API or upload paths
+  if (req.path.startsWith('/api/') || req.path.startsWith('/src/uploads/')) {
+    return res.status(404).send('Not found');
   }
   res.sendFile(path.join(__dirname, '../../../dist/index.html'));
 });
