@@ -16,7 +16,7 @@ connectDB();
 // CORS handled by nginx
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
-app.use('/src/uploads', express.static(path.join(__dirname, 'uploads'), {
+app.use('/src/uploads', express.static(path.join(__dirname, '../src/uploads'), {
   setHeaders: (res, filePath) => {
     // Set proper MIME types for Unity files
     if (filePath.endsWith('.wasm')) {
@@ -50,7 +50,7 @@ app.get('*', (req: Request, res: Response) => {
   if (req.path.startsWith('/api/') || req.path.startsWith('/src/uploads/')) {
     return res.status(404).send('Not found');
   }
-  res.sendFile(path.join(__dirname, '../../../dist/index.html'));
+  res.sendFile(path.join(__dirname, '../../dist/index.html'));
 });
 
 app.listen(PORT, () => {
