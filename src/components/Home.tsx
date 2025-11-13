@@ -16,6 +16,13 @@ export default function Home() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const comingSoonGames = [
+    'basket-ball-physics.png', 'Block-Sort-Puzzle.png', 'DIY-popit.png', 'Draw-To-Save.png',
+    'drunken-wrestler.png', 'Fish-Eat-Fish.png', 'little-right-organizer.png', 'Magnet-world.png',
+    'Nut&bolt.png', 'pc-simulator.png', 'Pixel-Art-Book.png', 'Princes-Room-Cleanup.png',
+    'Robo-Sumo-Wrestler.png', 'Tap-Away-3D.png', 'Traffic-jam.png', 'tug-the-table.png', 'world-builder.png'
+  ];
+
   useEffect(() => {
     fetchActiveGames();
   }, []);
@@ -33,32 +40,54 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1 className={styles.title}>GAME HUB</h1>
-        <p className={styles.subtitle}>Play the best WebGL games instantly</p>
+        <img src="/logo.png" alt="Logo" className={styles.logo} />
       </header>
 
       <div className={styles.grid}>
         {loading ? (
           <div className={styles.loading}>Loading games...</div>
-        ) : games.length === 0 ? (
-          <div className={styles.noGames}>No games available yet.</div>
         ) : (
-          games.map(game => (
-            <Link key={game._id} to={`/game/${game._id}`} className={styles.cardLink}>
-              <div className={styles.card}>
-                <img 
-                  src={`${import.meta.env.VITE_BASE_API_URL}/${game.iconPath.replace(/\\/g, '/')}`} 
-                  alt={game.title} 
-                  className={styles.icon} 
-                />
-                <h3 className={styles.gameTitle}>{game.title}</h3>
-                <p className={styles.description}>{game.description}</p>
+          <>
+            {/* ---- LIVE GAMES ---- */}
+            {games.map(game => (
+              <Link key={game._id} to={`/game/${game._id}`} className={styles.cardLink}>
+                <div className={styles.card}>
+                  <div className={styles.iconWrapper}>
+                    <img
+                      src={`${import.meta.env.VITE_BASE_API_URL}/${game.iconPath.replace(/\\/g, '/')}`}
+                      alt={game.title}
+                      className={styles.icon}
+                    />
+                  </div>
+
+                  <div className={styles.overlay}>
+                    <h3 className={styles.gameTitle}>{game.title}</h3>
+                  </div>
+                </div>
+              </Link>
+            ))}
+
+            {/* ---- COMING SOON ---- */}
+            {comingSoonGames.map((icon, idx) => (
+              <div key={`coming-soon-${idx}`} className={styles.card}>
+                <div className={styles.iconWrapper}>
+                  <img
+                    src={`/icons-coming-soon/${icon}`}
+                    alt="Coming Soon"
+                    className={styles.icon}
+                  />
+                </div>
+
+                <div className={styles.overlay}>
+                  <h3 className={styles.gameTitle}>Coming Soon</h3>
+                </div>
               </div>
-            </Link>
-          ))
+            ))}
+          </>
         )}
       </div>
     </div>

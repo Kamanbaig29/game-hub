@@ -1,5 +1,5 @@
 // src/components/GameView.tsx
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import styles from '../assets/gameView.module.css';
 
@@ -16,61 +16,17 @@ export default function GameView() {
   const { id } = useParams<{ id: string }>();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
-  const [dimensions, setDimensions] = useState({ width: 500, height: 500 });
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+
+  const comingSoonGames = [
+    'basket-ball-physics.png', 'Block-Sort-Puzzle.png', 'DIY-popit.png', 'Draw-To-Save.png',
+    'drunken-wrestler.png', 'Fish-Eat-Fish.png', 'little-right-organizer.png', 'Magnet-world.png',
+    'Nut&bolt.png', 'pc-simulator.png', 'Pixel-Art-Book.png', 'Princes-Room-Cleanup.png',
+    'Robo-Sumo-Wrestler.png', 'Tap-Away-3D.png', 'Traffic-jam.png', 'tug-the-table.png', 'world-builder.png'
+  ];
 
   useEffect(() => {
     fetchGame();
   }, [id]);
-
-  const handleIframeLoad = useCallback(() => {
-    if (iframeRef.current) {
-      const iframe = iframeRef.current;
-      setTimeout(() => {
-        iframe.contentWindow?.postMessage(
-          { type: 'unityResize', width: dimensions.width, height: dimensions.height },
-          '*'
-        );
-      }, 500);
-    }
-  }, [dimensions]);
-
-  const handleResize = useCallback((direction: 'right' | 'bottom', e: MouseEvent) => {
-    e.preventDefault();
-    
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startWidth = dimensions.width;
-    const startHeight = dimensions.height;
-
-    const onMouseMove = (moveEvent: MouseEvent) => {
-      if (direction === 'right') {
-        const deltaX = moveEvent.clientX - startX;
-        const newWidth = Math.max(400, Math.min(2560, startWidth + deltaX));
-        setDimensions(prev => ({ ...prev, width: newWidth }));
-      } else if (direction === 'bottom') {
-        const deltaY = moveEvent.clientY - startY;
-        const newHeight = Math.max(300, Math.min(1440, startHeight + deltaY));
-        setDimensions(prev => ({ ...prev, height: newHeight }));
-      }
-    };
-
-    const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-      
-      if (iframeRef.current) {
-        iframeRef.current.contentWindow?.postMessage(
-          { type: 'unityResize', width: dimensions.width, height: dimensions.height },
-          '*'
-        );
-      }
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  }, [dimensions]);
 
   const fetchGame = async () => {
     try {
@@ -107,43 +63,49 @@ export default function GameView() {
   return (
     <div className={styles.page}>
       <Link to="/" className={styles.homeBtn}>← Home</Link>
+      
       <div className={styles.container}>
-        <div 
-          ref={containerRef}
-          className={styles.playerWrapper}
-          style={{
-            width: `${dimensions.width}px`,
-            height: `${dimensions.height}px`,
-            transform: 'none',
-            position: 'relative'
-          }}
-        >
-          <div 
-            className={styles.resizeHandle}
-            data-direction="right"
-            onMouseDown={(e) => handleResize('right', e.nativeEvent)}
-          />
-          <div 
-            className={styles.resizeHandle}
-            data-direction="bottom"
-            onMouseDown={(e) => handleResize('bottom', e.nativeEvent)}
-          />
-          <iframe
-            ref={iframeRef}
-            src={`${import.meta.env.VITE_BASE_API_URL}/${game.zipFilePath.replace(/\\/g, '/')}/index.html`}
-            title={game.title}
-            className={styles.iframe}
-            allow="fullscreen"
-            loading="lazy"
-            onLoad={handleIframeLoad}
-          />
+        {/* ---- LEFT SECTION (Game Screen + Info) ---- */}
+        <div className={styles.leftSection}>
+          {/* Game Screen */}
+          <div className={styles.gameScreen}>
+            <iframe
+              src={`${import.meta.env.VITE_BASE_API_URL}/${game.zipFilePath.replace(/\\/g, '/')}/index.html`}
+              title={game.title}
+              className={styles.iframe}
+              allow="fullscreen"
+              loading="lazy"
+            />
+            <div className={styles.placeholder}>Game Screen (16:9)</div>
+          </div>
+          
+          {/* Game Info */}
+          <div className={styles.gameInfo}>
+            <h1 className={styles.gameTitle}>{game.title}</h1>
+            <p className={styles.gameDescription}>{game.description}</p>
+          </div>
         </div>
 
-        {/* <div className={styles.info}>
-          <h1 className={styles.title}>{game.title}</h1>
-          <p className={styles.description}>{game.description}</p>
-          <Link to="/" className={styles.backBtn}>Back to Games</Link>
-        </div> */}
+        {/* ---- SIDEBAR (Coming Soon) ---- */}
+        <div className={styles.sidebar}>
+          <h3 className={styles.sidebarTitle}>Coming Soon</h3>
+          <div className={styles.comingSoonGrid}>
+            {comingSoonGames.map((icon, idx) => (
+              <div key={idx} className={styles.comingSoonCard}>
+                <div className={styles.iconWrapper}>
+                  <img 
+                    src={`/icons-coming-soon/${icon}`} 
+                    alt="Coming Soon" 
+                    className={styles.comingSoonIcon} 
+                  />
+                </div>
+                <div className={styles.comingSoonOverlay}>
+                  <span className={styles.comingSoonText}>Coming Soon</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

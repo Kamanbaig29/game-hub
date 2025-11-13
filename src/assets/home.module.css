@@ -1,10 +1,11 @@
-/* src/components/Home.module.css */
+/* src/assets/home.module.css */
 .page {
   min-height: 100vh;
   padding: 2rem 5%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: linear-gradient(135deg, #1a0b2e 0%, #2d1b69 25%, #7209b7 50%, #a663cc 75%, #4c1d95 100%);
 }
 
 .header {
@@ -13,84 +14,129 @@
 }
 
 .title {
-  font-size: clamp(2.8rem, 7vw, 4.5rem);
-  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  background: linear-gradient(45deg, #e879f9, #c084fc, #a855f7, #9333ea);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 800;
   margin-bottom: 1rem;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 4px 12px rgba(147, 51, 234, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo {
+  height: clamp(3rem, 8vw, 5rem);
+  width: auto;
+  margin-bottom: 0.5rem;
 }
 
 .subtitle {
-  font-size: 1.4rem;
-  opacity: 0.85;
+  font-size: clamp(0.9rem, 3vw, 1.1rem);
+  color: #e2e8f0;
+  opacity: 0.9;
   max-width: 600px;
   margin: 0 auto;
 }
 
+/* ---------- GRID ---------- */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
   width: 100%;
   max-width: 1200px;
 }
 
+/* ---------- CARD ---------- */
 .cardLink {
   text-decoration: none;
   color: inherit;
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 1.25rem;
-  padding: 1.5rem;
-  text-align: center;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+  background: rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 1.90rem;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   cursor: pointer;
+  box-shadow: 0 8px 25px rgba(147, 51, 234, 0.2);
 }
 
+/* Hover lift */
 .card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-  border-color: rgba(78, 205, 196, 0.5);
+  box-shadow: 0 15px 35px rgba(147, 51, 234, 0.4);
+  border-color: rgba(168, 85, 247, 0.7);
+}
+
+/* ---- ICON WRAPPER (square box) ---- */
+.iconWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 100%; /* forces 1:1 aspect ratio */
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .icon {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 1rem;
-  margin-bottom: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.35s ease;
 }
 
+/* Zoom on hover – stays inside the wrapper */
 .card:hover .icon {
-  border-color: #4ecdc4;
-  transform: scale(1.05);
+  transform: scale(1.12);
+}
+
+/* ---- OVERLAY ---- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+}
+
+.card:hover .overlay {
+  opacity: 1;
 }
 
 .gameTitle {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #fff;
   margin: 0;
+  font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
 }
 
-/* Mobile */
+/* ---------- RESPONSIVE ---------- */
 @media (max-width: 768px) {
-  .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1.5rem; }
-  .title { font-size: 2.5rem; }
-  .subtitle { font-size: 1.2rem; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.8rem; }
+  .page { padding: 1.5rem 3%; }
 }
 
 @media (max-width: 480px) {
-  .page { padding: 1.5rem; }
-  .title { font-size: 2.2rem; }
+  .page { padding: 1rem 2%; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.6rem; }
+  .header { margin-bottom: 2rem; }
+}
+
+@media (max-width: 320px) {
+  .grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
 }
