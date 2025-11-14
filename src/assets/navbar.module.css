@@ -1,0 +1,144 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 2rem;
+  background: linear-gradient(135deg, #1a0b2e 0%, #2d1b69 50%, #7209b7 100%);
+  border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 4px 20px rgba(147, 51, 234, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo img {
+  height: 40px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+  transform: scale(1.05);
+}
+
+.searchBar {
+  max-width: 600px;
+  margin-left: auto;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.6rem 1.25rem;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 25px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  outline: none;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.searchInput:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.menuToggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.link {
+  color: #e4aeff;
+  text-decoration: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: bold;
+  background: transparent;
+  border: 2px solid transparent;
+}
+
+.link:hover {
+  /* background: #a955f76f; */
+  border-bottom: 2px solid #a955f76f;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .searchBar {
+    order: 3;
+    flex-basis: 100%;
+    margin: 1rem 0 0 0;
+    max-width: none;
+  }
+  
+  .menuToggle {
+    display: block;
+  }
+  
+  .links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #1a0b2e 0%, #2d1b69 50%, #7209b7 100%);
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    border-top: 1px solid rgba(168, 85, 247, 0.3);
+  }
+  
+  .linksOpen {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.75rem;
+  }
+  
+  .logo img {
+    height: 35px;
+  }
+  
+  .searchInput {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .link {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}

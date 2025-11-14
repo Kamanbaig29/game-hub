@@ -23,5 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
+crypto-games
 gamehub
 *.env

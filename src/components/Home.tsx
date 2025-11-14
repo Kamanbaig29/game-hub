@@ -43,10 +43,6 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <img src="/logo.png" alt="Logo" className={styles.logo} />
-      </header>
-
       <div className={styles.grid}>
         {loading ? (
           <div className={styles.loading}>Loading games...</div>

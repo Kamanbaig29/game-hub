@@ -4,6 +4,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './config/database.js';
 import gameRoutes from './routes/gameRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,7 +15,12 @@ const PORT = process.env.PORT;
 // Connect to MongoDB
 connectDB();
 
-// CORS handled by nginx
+// CORS configuration
+app.use(cors({
+  origin: ['http://localhost:6001','http://localhost:5173','http://localhost:5001', 'https://contact.cryptoverse.games', 'https://cryptoverse.games', 'https://admin.cryptoverse.games'],
+  credentials: true
+}));
+
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use('/src/uploads', express.static(path.join(__dirname, '../src/uploads'), {
@@ -40,6 +47,8 @@ app.use('/src/uploads', express.static(path.join(__dirname, '../src/uploads'), {
 
 // API routes first
 app.use('/api/games', gameRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Static files
 app.use(express.static(path.join(__dirname, '../../dist')));
