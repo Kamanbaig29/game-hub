@@ -518,6 +518,8 @@
     height: 100%;
     z-index: 1;
     pointer-events: none;
+    filter: blur(5px);
+    opacity: 0.5;
   }
   
   .heroModelsRow {
@@ -587,6 +589,8 @@
     height: 100%;
     z-index: 1;
     pointer-events: none;
+    filter: blur(5px); 
+    opacity: 0.5;
   }
   
   .ecosystemModels .heroModelsRow > * {
