@@ -6,9 +6,10 @@ interface GameModelProps {
   type: 'controller' | 'dice' | 'coin' | 'trophy' | 'joystick' | 'headset' | 'keyboard' | 'mouse' | 'solana' | 'wallet' | 'nft' | 'blockchain' | 'crypto' | 'web3' | 'token' | 'gamepad';
   size?: 'small' | 'medium' | 'large';
   interactive?: boolean;
+  className?: string;
 }
 
-export default function GameModel({ type, size = 'medium', interactive = true }: GameModelProps) {
+export default function GameModel({ type, size = 'medium', interactive = true, className }: GameModelProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
 
@@ -297,7 +298,7 @@ export default function GameModel({ type, size = 'medium', interactive = true }:
 
   return (
     <div 
-      className={`${styles.modelContainer} ${styles[size]} ${interactive ? styles.interactive : ''}`}
+      className={`${styles.modelContainer} ${styles[size]} ${interactive ? styles.interactive : ''} ${className || ''}`}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
