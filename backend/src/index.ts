@@ -17,7 +17,23 @@ connectDB();
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:6001','http://localhost:5173','http://localhost:5001', 'https://contact.cryptoverse.games', 'https://cryptoverse.games', 'https://admin.cryptoverse.games'],
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:6001',
+      'http://localhost:5173', 
+      'http://localhost:5001',
+      'http://localhost:7000',
+      'http://localhost:8000',
+      'https://contact.cryptoverse.games',
+      'https://cryptoverse.games',
+      'https://admin.cryptoverse.games'
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 

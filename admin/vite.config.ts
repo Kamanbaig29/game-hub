@@ -4,6 +4,12 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5001
+    port: 8000,
+    host: '0.0.0.0',
+    allowedHosts: ['admin.cryptoverse.games'],
+    proxy: {
+      '/api': 'https://cryptoverse.games',
+      '/src/uploads': 'https://cryptoverse.games'
+    }
   }
 })

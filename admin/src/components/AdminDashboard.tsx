@@ -25,7 +25,7 @@ export default function AdminDashboard() {
 
   const fetchGames = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/games`);
+      const response = await fetch('/api/games');
       if (response.ok) {
         const data = await response.json();
         setGames(data);
@@ -40,7 +40,7 @@ export default function AdminDashboard() {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/admin/profile`, {
+      const response = await fetch('/api/admin/profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {
@@ -54,7 +54,10 @@ export default function AdminDashboard() {
 
   const toggleGameStatus = async (id: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/games/${id}/toggle`, {
+      console.log('Toggling game ID:', id);
+      const url = `/api/games/${id}/toggle`;
+      console.log('Toggle URL:', url);
+      const response = await fetch(url, {
         method: 'PATCH'
       });
       if (response.ok) {
@@ -72,7 +75,10 @@ export default function AdminDashboard() {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/games/${deleteConfirm.gameId}`, {
+      console.log('Deleting game ID:', deleteConfirm.gameId);
+      const url = `/api/games/${deleteConfirm.gameId}`;
+      console.log('Delete URL:', url);
+      const response = await fetch(url, {
         method: 'DELETE'
       });
       if (response.ok) {
@@ -122,7 +128,7 @@ export default function AdminDashboard() {
             <div key={game._id} className={styles.card}>
               <div className={styles.content}>
                 <img 
-                  src={`${import.meta.env.VITE_BASE_API_URL}/${game.iconPath.replace(/\\/g, '/')}`} 
+                  src={`/${game.iconPath.replace(/\\/g, '/')}`} 
                   alt={game.title} 
                   className={styles.icon} 
                 />

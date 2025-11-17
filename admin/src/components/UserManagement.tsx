@@ -22,7 +22,7 @@ export default function UserManagement() {
   const fetchAdmins = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/admin/users`, {
+      const response = await fetch('/api/admin/users', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {
@@ -36,9 +36,15 @@ export default function UserManagement() {
 
   const handleCreateAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (newAdmin.password.length < 6) {
+      alert('Password must be at least 6 characters long');
+      return;
+    }
+    
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/admin/create`, {
+      const response = await fetch('/api/admin/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,16 +57,21 @@ export default function UserManagement() {
         setNewAdmin({ username: '', password: '', role: 'admin' });
         setShowCreateForm(false);
         fetchAdmins();
+        alert('Admin created successfully!');
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to create admin');
       }
     } catch (error) {
       console.error('Failed to create admin:', error);
+      alert('Failed to create admin');
     }
   };
 
   const handleDeleteAdmin = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/admin/users/${deleteConfirm.adminId}`, {
+      const response = await fetch('/api/admin/users/' + deleteConfirm.adminId, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

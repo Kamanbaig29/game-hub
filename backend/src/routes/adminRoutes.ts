@@ -12,10 +12,14 @@ const router = express.Router();
 // Login endpoint
 router.post('/login', async (req, res) => {
   try {
+    console.log('Login attempt:', req.body);
     const { username, password } = req.body;
 
     const admin = await Admin.findOne({ username });
+    console.log('Admin found:', admin ? 'Yes' : 'No');
+    
     if (!admin || !(await admin.comparePassword(password))) {
+      console.log('Login failed: Invalid credentials');
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 

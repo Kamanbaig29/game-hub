@@ -11,7 +11,7 @@ const createAdmin = async () => {
     await connectDB();
     console.log('Connected to GameHub database');
     
-    const username = '';
+    const username = 'superadmin@admin.com';
     const password = '';
     
     console.log('Checking for existing admin...');

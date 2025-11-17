@@ -31,7 +31,7 @@ export default function AdminUpload() {
       formData.append('icon', gameData.icon!);
       formData.append('zipFile', gameData.zipFile!);
 
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/games`, {
+      const response = await fetch('/api/games', {
         method: 'POST',
         body: formData
       });

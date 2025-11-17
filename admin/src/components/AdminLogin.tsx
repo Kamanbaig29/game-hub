@@ -11,7 +11,7 @@ export default function AdminLogin() {
     e.preventDefault();
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/admin/login`, {
+      const response = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials)
