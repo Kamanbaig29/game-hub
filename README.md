@@ -1,15 +1,45 @@
-# React + TypeScript + Vite
+# Cryptoverse - Web3 Gaming Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Cryptoverse is a cutting-edge Web3 gaming platform where players can enjoy games online while earning Solana cryptocurrency rewards. Built with React, TypeScript, and Vite for optimal performance.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Web3 Gaming**: Play games and earn real cryptocurrency rewards
+- **Solana Integration**: Fast, low-cost transactions powered by Solana blockchain
+- **NFT Rewards**: Earn unique digital collectibles while playing
+- **Wallet Integration**: Connect your Solana wallet to own your gaming assets
+- **Play-to-Earn**: Revolutionary gaming economy where skills translate to earnings
+- **Cross-Platform Assets**: Use your NFTs and tokens across multiple games
 
-## React Compiler
+## Technology Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React + TypeScript + Vite
+- **Blockchain**: Solana
+- **Styling**: CSS Modules with 3D animations
+- **Web3**: Wallet integration for decentralized gaming
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Start development server: `npm run dev`
+4. Connect your Solana wallet to start playing
+
+## Web3 Integration
+
+Cryptoverse integrates with popular Solana wallets including:
+- Phantom
+- Solflare
+- Backpack
+- And more...
+
+## Game Economy
+
+Our platform features a sustainable play-to-earn economy:
+- Earn SOL tokens for gameplay achievements
+- Collect rare NFTs as rewards
+- Trade assets on secondary markets
+- Stake tokens for additional rewards
 
 ## Expanding the ESLint configuration
 

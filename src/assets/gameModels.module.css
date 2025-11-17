@@ -1,0 +1,962 @@
+/* src/assets/gameModels.module.css */
+.modelContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+}
+
+.modelContainer.interactive:hover {
+  transform: perspective(1000px) scale(1.1) !important;
+}
+
+.small { width: 80px; height: 80px; }
+.medium { width: 120px; height: 120px; }
+.large { width: 160px; height: 160px; }
+
+/* Controller */
+.controller {
+  transform-style: preserve-3d;
+  animation: float 4s ease-in-out infinite;
+}
+
+.controllerBody {
+  width: 100px;
+  height: 60px;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border-radius: 25px;
+  position: relative;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 15px;
+  transform: translateZ(10px);
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  width: 16px;
+  height: 16px;
+}
+
+.dpadBtn {
+  background: #444;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.dpadBtn:hover {
+  background: #666;
+  transform: translateZ(2px);
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  width: 20px;
+  height: 20px;
+}
+
+.actionBtn {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btnA { background: #4CAF50; }
+.btnB { background: #f44336; }
+.btnX { background: #2196F3; }
+.btnY { background: #FF9800; }
+
+.actionBtn:hover {
+  transform: translateZ(3px) scale(1.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.sticks {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+}
+
+.stick {
+  width: 8px;
+  height: 8px;
+  background: #666;
+  border-radius: 50%;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Dice */
+.dice {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: roll 6s infinite linear;
+}
+
+.diceFace {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(145deg, #7c3aed, #a855f7, #c084fc);
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 8px;
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.diceFace[data-face="1"] { transform: rotateY(0deg) translateZ(30px); }
+.diceFace[data-face="2"] { transform: rotateY(90deg) translateZ(30px); }
+.diceFace[data-face="3"] { transform: rotateY(180deg) translateZ(30px); }
+.diceFace[data-face="4"] { transform: rotateY(-90deg) translateZ(30px); }
+.diceFace[data-face="5"] { transform: rotateX(90deg) translateZ(30px); }
+.diceFace[data-face="6"] { transform: rotateX(-90deg) translateZ(30px); }
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  margin: 1px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.diceFace[data-face="1"] .dot { align-self: center; }
+.diceFace[data-face="2"] .dot:first-child { align-self: flex-start; }
+.diceFace[data-face="2"] .dot:last-child { align-self: flex-end; }
+
+/* Coin */
+.coin {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: spin 3s infinite linear;
+}
+
+.coinSide {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.coinSide[data-side="heads"] {
+  background: linear-gradient(145deg, #FFD700, #FFA500);
+  color: #8B4513;
+  transform: rotateY(0deg) translateZ(2px);
+}
+
+.coinSide[data-side="tails"] {
+  background: linear-gradient(145deg, #C0C0C0, #A0A0A0);
+  color: #333;
+  transform: rotateY(180deg) translateZ(2px);
+}
+
+/* Trophy */
+.trophy {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.trophyCup {
+  width: 40px;
+  height: 35px;
+  background: linear-gradient(145deg, #FFD700, #FFA500);
+  border-radius: 20px 20px 5px 5px;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+  transform: translateZ(5px);
+}
+
+.trophyBase {
+  width: 50px;
+  height: 15px;
+  background: linear-gradient(145deg, #8B4513, #654321);
+  border-radius: 25px;
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%) translateZ(2px);
+}
+
+.trophyHandles {
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  height: 20px;
+}
+
+.handle {
+  position: absolute;
+  width: 8px;
+  height: 20px;
+  background: linear-gradient(145deg, #FFD700, #FFA500);
+  border-radius: 10px;
+  top: 0;
+}
+
+.handle:first-child {
+  left: -8px;
+  transform: rotateZ(-20deg);
+}
+
+.handle:last-child {
+  right: -8px;
+  transform: rotateZ(20deg);
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotateZ(0deg); }
+  50% { transform: translateY(-10px) rotateZ(5deg); }
+}
+
+@keyframes roll {
+  0% { transform: rotateX(0deg) rotateY(0deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-15px) scale(1.1); }
+}
+
+/* Hover effects */
+.modelContainer:hover .controller {
+  animation-play-state: paused;
+}
+
+.modelContainer:hover .dice {
+  animation-duration: 0.5s;
+}
+
+.modelContainer:hover .coin {
+  animation-duration: 1s;
+}
+
+.modelContainer:hover .trophy {
+  animation-duration: 1s;
+}
+
+/* Joystick */
+.joystick {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: tilt 3s ease-in-out infinite;
+}
+
+.joystickBase {
+  width: 40px;
+  height: 15px;
+  background: linear-gradient(145deg, #333, #111);
+  border-radius: 20px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  transform: translateZ(2px);
+}
+
+.joystickStick {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 25px;
+  background: linear-gradient(145deg, #666, #444);
+  border-radius: 3px;
+  transform-origin: bottom;
+}
+
+.joystickBall {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(145deg, #ff6b6b, #e74c3c);
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Headset */
+.headset {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: sway 4s ease-in-out infinite;
+}
+
+.headband {
+  width: 60px;
+  height: 8px;
+  background: linear-gradient(145deg, #2c3e50, #1a252f);
+  border-radius: 10px;
+  position: relative;
+  transform: translateZ(5px);
+}
+
+.earCups {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  top: 5px;
+  width: 70px;
+  left: -5px;
+}
+
+.earCup {
+  width: 20px;
+  height: 25px;
+  background: linear-gradient(145deg, #34495e, #2c3e50);
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  transform: translateZ(3px);
+}
+
+.microphone {
+  position: absolute;
+  bottom: -15px;
+  left: 5px;
+  width: 2px;
+  height: 15px;
+  background: #666;
+  border-radius: 1px;
+  transform: rotateZ(-30deg);
+}
+
+.microphone::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: -2px;
+  width: 6px;
+  height: 6px;
+  background: #333;
+  border-radius: 50%;
+}
+
+/* Keyboard */
+.keyboard {
+  transform-style: preserve-3d;
+  animation: type 2s ease-in-out infinite;
+}
+
+.keyboardBody {
+  width: 80px;
+  height: 30px;
+  background: linear-gradient(145deg, #2c3e50, #1a252f);
+  border-radius: 5px;
+  padding: 4px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transform: translateZ(5px);
+}
+
+.key {
+  background: linear-gradient(145deg, #ecf0f1, #bdc3c7);
+  border-radius: 2px;
+  transition: all 0.1s ease;
+}
+
+.key:hover {
+  background: linear-gradient(145deg, #3498db, #2980b9);
+  transform: translateZ(2px);
+}
+
+/* Mouse */
+.mouse {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: click 3s ease-in-out infinite;
+}
+
+.mouseBody {
+  width: 35px;
+  height: 50px;
+  background: linear-gradient(145deg, #34495e, #2c3e50);
+  border-radius: 15px 15px 8px 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transform: translateZ(5px);
+}
+
+.mouseButtons {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1px;
+}
+
+.mouseBtn {
+  width: 15px;
+  height: 20px;
+  background: linear-gradient(145deg, #ecf0f1, #bdc3c7);
+  border-radius: 8px 8px 0 0;
+  transition: all 0.1s ease;
+}
+
+.mouseBtn:hover {
+  background: linear-gradient(145deg, #e74c3c, #c0392b);
+  transform: translateZ(2px);
+}
+
+.scrollWheel {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 15px;
+  background: #666;
+  border-radius: 4px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* New Animations */
+@keyframes tilt {
+  0%, 100% { transform: rotateZ(0deg) rotateX(10deg); }
+  50% { transform: rotateZ(15deg) rotateX(-5deg); }
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotateZ(0deg); }
+  50% { transform: rotateZ(-10deg); }
+}
+
+@keyframes type {
+  0%, 100% { transform: rotateX(0deg); }
+  50% { transform: rotateX(-5deg); }
+}
+
+@keyframes click {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Solana */
+.solana {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: solanaGlow 3s ease-in-out infinite;
+}
+
+.solanaLogo {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9945FF, #14F195);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px rgba(153, 69, 255, 0.6);
+  transform: translateZ(10px);
+}
+
+.solanaGradient {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #9945FF, #14F195, #9945FF);
+  animation: rotate 4s linear infinite;
+}
+
+.solanaSymbol {
+  font-size: 24px;
+  color: white;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.solanaRings {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ring {
+  position: absolute;
+  border: 2px solid rgba(153, 69, 255, 0.3);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.ring:nth-child(1) {
+  width: 80px;
+  height: 80px;
+  top: -40px;
+  left: -40px;
+  animation-delay: 0s;
+}
+
+.ring:nth-child(2) {
+  width: 100px;
+  height: 100px;
+  top: -50px;
+  left: -50px;
+  animation-delay: 0.5s;
+}
+
+.ring:nth-child(3) {
+  width: 120px;
+  height: 120px;
+  top: -60px;
+  left: -60px;
+  animation-delay: 1s;
+}
+
+/* Wallet */
+.wallet {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: walletFloat 4s ease-in-out infinite;
+}
+
+.walletBody {
+  width: 50px;
+  height: 35px;
+  background: linear-gradient(145deg, #1a1a2e, #16213e);
+  border-radius: 8px;
+  border: 1px solid #9945FF;
+  box-shadow: 0 5px 15px rgba(153, 69, 255, 0.3);
+  transform: translateZ(5px);
+  position: relative;
+}
+
+.walletScreen {
+  width: 40px;
+  height: 20px;
+  background: linear-gradient(135deg, #0f3460, #16213e);
+  border-radius: 4px;
+  margin: 4px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 6px;
+  color: #14F195;
+}
+
+.walletBalance {
+  font-weight: bold;
+  margin-bottom: 1px;
+}
+
+.walletAmount {
+  font-size: 5px;
+  opacity: 0.8;
+}
+
+.walletButtons {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+}
+
+.walletBtn {
+  width: 6px;
+  height: 3px;
+  background: #9945FF;
+  border-radius: 1px;
+}
+
+/* NFT */
+.nft {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: nftShine 3s ease-in-out infinite;
+}
+
+.nftFrame {
+  width: 50px;
+  height: 60px;
+  background: linear-gradient(145deg, #2d1b69, #1a0b3e);
+  border: 2px solid #9945FF;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 0 20px rgba(153, 69, 255, 0.4);
+  transform: translateZ(5px);
+}
+
+.nftImage {
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(45deg, #14F195, #9945FF);
+  border-radius: 4px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1px;
+  padding: 2px;
+}
+
+.nftPixel {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1px;
+}
+
+.nftPixel:nth-child(odd) {
+  background: rgba(20, 241, 149, 0.8);
+}
+
+.nftLabel {
+  text-align: center;
+  color: #14F195;
+  font-size: 8px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+/* Blockchain */
+.blockchain {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: blockchainMove 4s ease-in-out infinite;
+}
+
+.blockchainChain {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.block {
+  width: 15px;
+  height: 15px;
+  background: linear-gradient(145deg, #9945FF, #7c3aed);
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(153, 69, 255, 0.4);
+  position: relative;
+  transform: translateZ(5px);
+}
+
+.block::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 1px;
+}
+
+.connector {
+  width: 8px;
+  height: 2px;
+  background: #14F195;
+  border-radius: 1px;
+  box-shadow: 0 0 5px rgba(20, 241, 149, 0.6);
+}
+
+/* Crypto */
+.crypto {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: cryptoPulse 2s ease-in-out infinite;
+}
+
+.cryptoCoin {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(145deg, #f7931a, #ff9500);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 5px 20px rgba(247, 147, 26, 0.4);
+  transform: translateZ(10px);
+}
+
+.cryptoGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70px;
+  height: 70px;
+  background: radial-gradient(circle, rgba(247, 147, 26, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Web3 */
+.web3 {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: web3Rotate 6s linear infinite;
+}
+
+.web3Cube {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.cubeFace {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(145deg, rgba(153, 69, 255, 0.8), rgba(20, 241, 149, 0.8));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.cubeFace:nth-child(1) { transform: rotateY(0deg) translateZ(20px); }
+.cubeFace:nth-child(2) { transform: rotateY(90deg) translateZ(20px); }
+.cubeFace:nth-child(3) { transform: rotateY(180deg) translateZ(20px); }
+.cubeFace:nth-child(4) { transform: rotateY(-90deg) translateZ(20px); }
+.cubeFace:nth-child(5) { transform: rotateX(90deg) translateZ(20px); }
+.cubeFace:nth-child(6) { transform: rotateX(-90deg) translateZ(20px); }
+
+.web3Particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #14F195;
+  border-radius: 50%;
+  animation: particleFloat 3s ease-in-out infinite;
+}
+
+.particle:nth-child(1) {
+  top: -30px;
+  left: -10px;
+  animation-delay: 0s;
+}
+
+.particle:nth-child(2) {
+  top: -20px;
+  right: -15px;
+  animation-delay: 1s;
+}
+
+.particle:nth-child(3) {
+  bottom: -25px;
+  left: 5px;
+  animation-delay: 2s;
+}
+
+/* Token */
+.token {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: tokenSpin 4s ease-in-out infinite;
+}
+
+.tokenBody {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(145deg, #14F195, #00d4aa);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(20, 241, 149, 0.4);
+  transform: translateZ(5px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.tokenSymbol {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.tokenValue {
+  font-size: 8px;
+  opacity: 0.9;
+}
+
+.tokenGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(20, 241, 149, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: glow 3s ease-in-out infinite;
+}
+
+/* Gamepad */
+.gamepad {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: gamepadGlow 3s ease-in-out infinite;
+}
+
+.gamepadBody {
+  width: 55px;
+  height: 40px;
+  background: linear-gradient(145deg, #1a1a2e, #16213e);
+  border-radius: 8px;
+  border: 1px solid #9945FF;
+  box-shadow: 0 5px 15px rgba(153, 69, 255, 0.3);
+  transform: translateZ(5px);
+  position: relative;
+  padding: 4px;
+}
+
+.gamepadScreen {
+  width: 35px;
+  height: 20px;
+  background: linear-gradient(135deg, #0f3460, #16213e);
+  border-radius: 4px;
+  margin: 0 auto 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gamepadPixels {
+  display: flex;
+  gap: 2px;
+}
+
+.pixel {
+  width: 3px;
+  height: 3px;
+  background: #14F195;
+  border-radius: 1px;
+  animation: pixelBlink 2s ease-in-out infinite;
+}
+
+.pixel:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.pixel:nth-child(3) {
+  animation-delay: 1s;
+}
+
+.gamepadControls {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+
+.gamepadBtn {
+  width: 8px;
+  height: 4px;
+  background: #9945FF;
+  border-radius: 2px;
+}
+
+/* New Animations */
+@keyframes solanaGlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.2); opacity: 0.1; }
+}
+
+@keyframes walletFloat {
+  0%, 100% { transform: translateY(0px) rotateY(0deg); }
+  50% { transform: translateY(-8px) rotateY(10deg); }
+}
+
+@keyframes nftShine {
+  0%, 100% { box-shadow: 0 0 20px rgba(153, 69, 255, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(20, 241, 149, 0.6); }
+}
+
+@keyframes blockchainMove {
+  0%, 100% { transform: translateX(0px); }
+  50% { transform: translateX(5px); }
+}
+
+@keyframes cryptoPulse {
+  0%, 100% { transform: scale(1) rotateY(0deg); }
+  50% { transform: scale(1.1) rotateY(180deg); }
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+@keyframes web3Rotate {
+  0% { transform: rotateX(0deg) rotateY(0deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+@keyframes particleFloat {
+  0%, 100% { transform: translateY(0px); opacity: 1; }
+  50% { transform: translateY(-10px); opacity: 0.5; }
+}
+
+@keyframes tokenSpin {
+  0%, 100% { transform: rotateZ(0deg) scale(1); }
+  50% { transform: rotateZ(180deg) scale(1.1); }
+}
+
+@keyframes gamepadGlow {
+  0%, 100% { box-shadow: 0 5px 15px rgba(153, 69, 255, 0.3); }
+  50% { box-shadow: 0 5px 25px rgba(153, 69, 255, 0.6); }
+}
+
+@keyframes pixelBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}

@@ -3,10 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './components/Home';
+import Library from './components/Library';
 import About from './components/About';
-
 import Privacy from './components/Privacy';
-
 import GameView from './components/GameView';
 import './App.css';
 
@@ -18,6 +17,7 @@ function App() {
         <main style={{ minHeight: 'calc(100vh - 200px)' }}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/library" element={<Library />} />
             <Route path="/game/:id" element={<GameView />} />
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
