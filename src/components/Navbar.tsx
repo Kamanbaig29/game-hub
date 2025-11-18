@@ -30,8 +30,7 @@ export default function Navbar() {
       </Link>
 
       <div className={`${styles.navLinks} ${isMenuOpen ? styles.navLinksOpen : ''}`}>
-        <Link to="/" className={styles.navLink}>Home</Link>
-        <Link to="/library" className={styles.navLink}>Library</Link>
+        <Link to="/arena" className={styles.navLink}>Arena</Link>
         <Link to="/about" className={styles.navLink}>About</Link>
         <Link to="https://contact.cryptoverse.games" className={styles.navLink} target="_blank" rel="noopener">
           Contact

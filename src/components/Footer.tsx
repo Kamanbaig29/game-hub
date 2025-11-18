@@ -9,7 +9,7 @@ export default function Footer() {
           <Link to="/" className={styles.logo}>
             <img src="/logo.png" alt="Game Hub" />
           </Link>
-          <p className={styles.copyright}>© 2025 Game Hub. All rights reserved.</p>
+          <p className={styles.copyright}>© 2025 Crypto Verse. All rights reserved.</p>
         </div>
         
         <div className={styles.links}>

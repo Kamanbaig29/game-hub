@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Home from './components/Home';
+import Arena from './components/Arena';
 import Library from './components/Library';
 import About from './components/About';
 import Privacy from './components/Privacy';
@@ -16,8 +16,8 @@ function App() {
         <Navbar />
         <main style={{ minHeight: 'calc(100vh - 200px)' }}>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/library" element={<Library />} />
+            <Route path="/" element={<Library />} />
+            <Route path="/arena" element={<Arena />} />
             <Route path="/game/:id" element={<GameView />} />
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />

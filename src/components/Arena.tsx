@@ -1,13 +1,73 @@
-// src/components/Home.tsx
+// src/components/Arena.tsx
 import { Link } from 'react-router-dom';
 import GameModel from './GameModels';
 import styles from '../assets/home.module.css';
+import { Marquee } from "@/components/ui/marquee";
+import { cn } from "@/lib/utils";
 
-export default function Home() {
+const gameImages = [
+  'basket-ball-physics.png',
+  'Block-Sort-Puzzle.png',
+  'DIY-popit.png',
+  'Draw-To-Save.png',
+  'drunken-wrestler.png',
+  'Fish-Eat-Fish.png',
+  'little-right-organizer.png',
+  'Magnet-world.png',
+  'Nut&bolt.png',
+  'pc-simulator.png',
+  'Pixel-Art-Book.png',
+  'Princes-Room-Cleanup.png',
+  'Robo-Sumo-Wrestler.png',
+  'Tap-Away-3D.png',
+  'Traffic-jam.png',
+  'tug-the-table.png',
+  'world-builder.png'
+];
+
+const firstRow = gameImages.slice(0, Math.ceil(gameImages.length / 2));
+const secondRow = gameImages.slice(Math.ceil(gameImages.length / 2));
+
+const GameImageCard = ({ img }: { img: string }) => {
+  return (
+    <div className={cn(
+      "relative h-32 w-32 cursor-pointer overflow-hidden rounded-xl border",
+      "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
+      "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
+      "flex items-center justify-center p-2"
+    )}>
+      <img 
+        src={`/icons-coming-soon/${img}`} 
+        alt={img.replace('.png', '')}
+        className="w-full h-full object-contain"
+      />
+    </div>
+  );
+};
+
+export default function Arena() {
   return (
     <div className={styles.container}>
       {/* Hero Section */}
       <section className={styles.hero}>
+        {/* Marquee Background with Images */}
+        <div className={styles.heroMarquee}>
+          <Marquee pauseOnHover className="[--duration:20s]">
+            {firstRow.map((img, index) => (
+              <GameImageCard key={`${img}-${index}`} img={img} />
+            ))}
+          </Marquee>
+          <Marquee reverse pauseOnHover className="[--duration:20s]">
+            {secondRow.map((img, index) => (
+              <GameImageCard key={`${img}-${index}`} img={img} />
+            ))}
+          </Marquee>
+        </div>
+        
+        {/* Black Opacity Overlay */}
+        <div className={styles.heroOverlay}></div>
+
+        {/* Hero Content */}
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
             <h1 className={styles.heroTitle}>
@@ -17,7 +77,7 @@ export default function Home() {
               Play Web3 games, earn Solana rewards, and experience the future of decentralized gaming
             </p>
             <div className={styles.heroButtons}>
-              <Link to="/library" className={styles.primaryBtn}>
+              <Link to="/" className={styles.primaryBtn}>
                 Explore Games
               </Link>
               <Link to="/about" className={styles.secondaryBtn}>
@@ -25,7 +85,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          
+
           <div className={styles.heroModels}>
             <div className={styles.heroModelsRow}>
               <GameModel type="solana" size="large" />
@@ -77,17 +137,17 @@ export default function Home() {
             <div className={styles.web3Card}>
               <GameModel type="controller" size="medium" />
               <h3>Action Games</h3>
-              <p>Fast-paced adventures with instant Solana rewards for achievements</p>
+              <p>Fast-paced adventures with instant rewards for achievements</p>
             </div>
             <div className={styles.web3Card}>
               <GameModel type="keyboard" size="medium" />
               <h3>Strategy Games</h3>
-              <p>Test your skills in puzzle and strategy games while earning crypto</p>
+              <p>Test your skills in puzzle and strategy games while playing on Solana</p>
             </div>
             <div className={styles.web3Card}>
               <GameModel type="trophy" size="medium" />
               <h3>Tournaments</h3>
-              <p>Compete in daily tournaments and win exclusive NFT prizes</p>
+              <p>Compete in daily tournaments and win prizes using Solana</p>
             </div>
           </div>
         </div>
@@ -132,7 +192,7 @@ export default function Home() {
           <h2>Start Your Gaming Journey</h2>
           <p>Join thousands of players in the ultimate Web3 gaming experience</p>
           <div className={styles.ctaButtons}>
-            <Link to="/library" className={styles.ctaBtn}>
+            <Link to="/" className={styles.ctaBtn}>
               Start Playing Now
             </Link>
             <Link to="/about" className={styles.secondaryBtn}>
@@ -144,3 +204,4 @@ export default function Home() {
     </div>
   );
 }
+
