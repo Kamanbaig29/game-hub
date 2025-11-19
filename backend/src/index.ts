@@ -6,6 +6,7 @@ import connectDB from './config/database.js';
 import gameRoutes from './routes/gameRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import featureGameRoutes from './routes/featureGameRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -65,6 +66,7 @@ app.use('/src/uploads', express.static(path.join(__dirname, '../src/uploads'), {
 app.use('/api/games', gameRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/feature-games', featureGameRoutes);
 
 // Static files
 app.use(express.static(path.join(__dirname, '../../dist')));

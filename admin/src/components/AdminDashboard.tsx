@@ -107,6 +107,9 @@ export default function AdminDashboard() {
           <Link to="/upload" className={styles.uploadBtn}>
             Upload New Game
           </Link>
+          <Link to="/feature-games" className={styles.uploadBtn}>
+            Feature Games
+          </Link>
           {userRole === 'super-admin' && (
             <Link to="/users" className={styles.usersBtn}>
               Manage Users
