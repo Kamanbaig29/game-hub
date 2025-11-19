@@ -33,18 +33,19 @@
 
 .topBackBtn {
   position: absolute;
-  top: 2rem;
-  left: 2rem;
-  padding: 8px 16px;
+  top: clamp(1rem, 3vw, 2rem);
+  left: clamp(1rem, 3vw, 2rem);
+  padding: clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 16px);
   background: linear-gradient(45deg, #6b7280, #4b5563);
   color: white;
   text-decoration: none;
   border-radius: 20px;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
   z-index: 10;
+  white-space: nowrap;
 }
 
 .topBackBtn:hover {
@@ -185,10 +186,47 @@
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-/* Mobile */
+/* Responsive */
+@media (max-width: 768px) {
+  .page {
+    padding: 1rem;
+    align-items: flex-start;
+    padding-top: 4rem;
+  }
+  .container {
+    padding: 1.25rem;
+  }
+  .topBackBtn {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+}
+
 @media (max-width: 480px) {
-  .container { padding: 1.5rem; border-radius: 1.25rem; }
-  .title { font-size: 1.8rem; }
-  .label { font-size: 1rem; }
-  .submitBtn { padding: 0.9rem; font-size: 1rem; }
+  .page {
+    padding: 0.75rem;
+    padding-top: 3.5rem;
+  }
+  .container { 
+    padding: 1rem; 
+    border-radius: 1.25rem; 
+  }
+  .title { 
+    font-size: clamp(1.4rem, 6vw, 1.8rem); 
+    margin-bottom: 1rem;
+  }
+  .label { 
+    font-size: clamp(0.85rem, 3vw, 1rem); 
+  }
+  .submitBtn { 
+    padding: clamp(0.75rem, 3vw, 0.9rem); 
+    font-size: clamp(0.9rem, 3vw, 1rem); 
+  }
+  .input, .textarea {
+    font-size: clamp(0.8rem, 2.5vw, 0.85rem);
+    padding: clamp(0.5rem, 2vw, 0.6rem) clamp(0.6rem, 2vw, 0.8rem);
+  }
 }

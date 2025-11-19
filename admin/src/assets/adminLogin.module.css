@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: clamp(1rem, 4vw, 2rem);
 }
 
 .container {
@@ -16,31 +16,31 @@
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(168, 85, 247, 0.3);
   border-radius: 1.5rem;
-  padding: 2.5rem;
+  padding: clamp(1.5rem, 5vw, 2.5rem);
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 25px rgba(147, 51, 234, 0.2);
 }
 
 .title {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
   font-weight: 700;
   background: linear-gradient(45deg, #e879f9, #c084fc, #a855f7, #9333ea);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
 }
 
 .input {
   width: 100%;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
+  padding: clamp(0.75rem, 3vw, 1rem);
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(168, 85, 247, 0.3);
   border-radius: 0.75rem;
   color: #e2e8f0;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
   box-sizing: border-box;
   transition: all 0.3s ease;
 }
@@ -57,12 +57,12 @@
 
 .button {
   width: 100%;
-  padding: 1rem;
+  padding: clamp(0.75rem, 3vw, 1rem);
   background: linear-gradient(45deg, #a855f7, #9333ea);
   color: white;
   border: none;
   border-radius: 0.75rem;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;

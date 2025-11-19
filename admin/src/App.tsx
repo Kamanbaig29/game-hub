@@ -4,6 +4,8 @@ import AdminUpload from './components/AdminUpload';
 import AdminLogin from './components/AdminLogin';
 import UserManagement from './components/UserManagement';
 import AdminFeatureGames from './components/AdminFeatureGames';
+import AdminTags from './components/AdminTags';
+import AdminCategories from './components/AdminCategories';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -16,6 +18,8 @@ function App() {
         <Route path="/upload" element={<ProtectedRoute><AdminUpload /></ProtectedRoute>} />
         <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
         <Route path="/feature-games" element={<ProtectedRoute><AdminFeatureGames /></ProtectedRoute>} />
+        <Route path="/tags" element={<ProtectedRoute><AdminTags /></ProtectedRoute>} />
+        <Route path="/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

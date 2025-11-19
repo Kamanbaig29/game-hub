@@ -10,23 +10,31 @@ interface Game {
   isActive: boolean;
 }
 
+interface Tag {
+  _id: string;
+  name: string;
+  color: string;
+}
+
 interface FeatureGame {
   _id: string;
   gameId: Game;
-  tag: 'hot' | 'new' | 'trending' | 'updated';
+  tagId: Tag;
   position: number;
 }
 
 export default function AdminFeatureGames() {
   const [games, setGames] = useState<Game[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [featureGames, setFeatureGames] = useState<(FeatureGame | null)[]>(Array(6).fill(null));
   const [loading, setLoading] = useState(true);
   const [editingTile, setEditingTile] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<{ gameId: string; tag: 'hot' | 'new' | 'trending' | 'updated' } | null>(null);
+  const [editForm, setEditForm] = useState<{ gameId: string; tagId: string } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchGames();
+    fetchTags();
     fetchFeatureGames();
   }, []);
 
@@ -42,15 +50,31 @@ export default function AdminFeatureGames() {
     }
   };
 
+  const fetchTags = async () => {
+    try {
+      const response = await fetch('/api/tags');
+      if (response.ok) {
+        const data = await response.json();
+        setTags(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch tags:', error);
+    }
+  };
+
   const fetchFeatureGames = async () => {
     try {
       const response = await fetch('/api/feature-games');
       if (response.ok) {
         const data = await response.json();
         // Create array with 6 positions, fill with existing feature games
+        // Filter out feature games with null gameId or tagId (deleted games/tags)
         const featureGamesMap = new Map<number, FeatureGame>();
         data.forEach((fg: FeatureGame) => {
-          featureGamesMap.set(fg.position, fg);
+          // Only include feature games that have valid gameId and tagId
+          if (fg.gameId && fg.tagId) {
+            featureGamesMap.set(fg.position, fg);
+          }
         });
         const featureGamesArray: (FeatureGame | null)[] = Array.from({ length: 6 }, (_, i) => {
           const position = i + 1;
@@ -70,36 +94,40 @@ export default function AdminFeatureGames() {
     if (existingFeature) {
       setEditForm({
         gameId: existingFeature.gameId._id,
-        tag: existingFeature.tag
+        tagId: existingFeature.tagId._id
       });
     } else {
       setEditForm({
         gameId: games.length > 0 ? games[0]._id : '',
-        tag: 'new'
+        tagId: tags.length > 0 ? tags[0]._id : ''
       });
     }
     setEditingTile(position);
   };
 
   const handleSave = async (position: number) => {
-    if (!editForm || !editForm.gameId) {
-      alert('Please select a game');
+    if (!editForm || !editForm.gameId || !editForm.tagId) {
+      alert('Please select both a game and a tag');
       return;
     }
 
     try {
       const existingFeature = featureGames[position - 1];
-      const url = existingFeature 
-        ? `/api/feature-games/${existingFeature._id}`
-        : '/api/feature-games';
       
-      const method = existingFeature ? 'PUT' : 'POST';
-      const body = existingFeature
-        ? { gameId: editForm.gameId, tag: editForm.tag, position }
-        : { ...editForm, position };
+      // Always use POST for create/update, but include _id if updating
+      const body: any = {
+        gameId: editForm.gameId,
+        tagId: editForm.tagId,
+        position
+      };
+      
+      // Include _id only if we're updating an existing feature game
+      if (existingFeature) {
+        body._id = existingFeature._id;
+      }
 
-      const response = await fetch(url, {
-        method,
+      const response = await fetch('/api/feature-games', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -154,14 +182,12 @@ export default function AdminFeatureGames() {
     navigate('/login');
   };
 
-  const getTagColor = (tag: string) => {
-    switch (tag) {
-      case 'hot': return '#ff4444';
-      case 'new': return '#44ff44';
-      case 'trending': return '#4444ff';
-      case 'updated': return '#ffaa00';
-      default: return '#999';
-    }
+  const getTagColor = (tag: Tag) => {
+    return tag?.color || '#999';
+  };
+
+  const getTagName = (tag: Tag) => {
+    return tag?.name || 'Unknown';
   };
 
   return (
@@ -181,8 +207,18 @@ export default function AdminFeatureGames() {
         </div>
       </div>
 
-      <div style={{ marginBottom: '2rem', padding: '1rem', background: 'rgba(153, 69, 255, 0.1)', borderRadius: '8px' }}>
-        <p style={{ color: '#b0b0b0', margin: 0 }}>
+      <div style={{ 
+        marginBottom: 'clamp(1rem, 3vw, 2rem)', 
+        padding: 'clamp(0.75rem, 2vw, 1rem)', 
+        background: 'rgba(153, 69, 255, 0.1)', 
+        borderRadius: '8px' 
+      }}>
+        <p style={{ 
+          color: '#b0b0b0', 
+          margin: 0,
+          fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+          lineHeight: '1.5'
+        }}>
           Manage the 6 featured games displayed on the homepage. Each tile can be assigned a game and a tag (Hot, New, or Trending).
         </p>
       </div>
@@ -192,8 +228,8 @@ export default function AdminFeatureGames() {
       ) : (
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-          gap: '1.5rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', 
+          gap: 'clamp(1rem, 3vw, 1.5rem)',
           maxWidth: '1200px',
           margin: '0 auto'
         }}>
@@ -209,11 +245,15 @@ export default function AdminFeatureGames() {
                   background: 'rgba(255, 255, 255, 0.05)',
                   border: '1px solid rgba(153, 69, 255, 0.3)',
                   borderRadius: '12px',
-                  padding: '1rem',
+                  padding: 'clamp(0.75rem, 2vw, 1rem)',
                   position: 'relative'
                 }}
               >
-                <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', color: '#b0b0b0' }}>
+                <div style={{ 
+                  marginBottom: '0.5rem', 
+                  fontSize: 'clamp(0.8rem, 2vw, 0.9rem)', 
+                  color: '#b0b0b0' 
+                }}>
                   Position {position}
                 </div>
 
@@ -250,8 +290,8 @@ export default function AdminFeatureGames() {
                         Select Tag:
                       </label>
                       <select
-                        value={editForm?.tag || 'new'}
-                        onChange={(e) => setEditForm({ ...editForm!, tag: e.target.value as 'hot' | 'new' | 'trending' | 'updated' })}
+                        value={editForm?.tagId || ''}
+                        onChange={(e) => setEditForm({ ...editForm!, tagId: e.target.value })}
                         style={{
                           width: '100%',
                           padding: '0.5rem',
@@ -262,10 +302,12 @@ export default function AdminFeatureGames() {
                           fontSize: '0.9rem'
                         }}
                       >
-                        <option value="hot">Hot</option>
-                        <option value="new">New</option>
-                        <option value="trending">Trending</option>
-                        <option value="updated">Updated</option>
+                        <option value="">-- Select Tag --</option>
+                        {tags.map(tag => (
+                          <option key={tag._id} value={tag._id}>
+                            {tag.name.charAt(0).toUpperCase() + tag.name.slice(1)}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
@@ -303,7 +345,7 @@ export default function AdminFeatureGames() {
                   </div>
                 ) : (
                   <>
-                    {featureGame ? (
+                    {featureGame && featureGame.gameId && featureGame.tagId ? (
                       <>
                         <div style={{ marginBottom: '1rem', textAlign: 'center' }}>
                           <img
@@ -329,7 +371,7 @@ export default function AdminFeatureGames() {
                             style={{
                               display: 'inline-block',
                               padding: '0.25rem 0.75rem',
-                              background: getTagColor(featureGame.tag),
+                              background: getTagColor(featureGame.tagId),
                               borderRadius: '12px',
                               color: '#fff',
                               fontSize: '0.75rem',
@@ -337,7 +379,7 @@ export default function AdminFeatureGames() {
                               textTransform: 'uppercase'
                             }}
                           >
-                            {featureGame.tag}
+                            {getTagName(featureGame.tagId)}
                           </span>
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem' }}>

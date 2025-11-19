@@ -8,13 +8,15 @@ export interface IGame extends Document {
   extractPath: string;
   uploadDate: Date;
   isActive: boolean;
+  categories?: mongoose.Types.ObjectId[];
 }
 
 const GameSchema: Schema = new Schema({
   title: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    unique: true
   },
   description: {
     type: String,
@@ -40,7 +42,11 @@ const GameSchema: Schema = new Schema({
   isActive: {
     type: Boolean,
     default: true
-  }
+  },
+  categories: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Category'
+  }]
 }, {
   timestamps: true
 });

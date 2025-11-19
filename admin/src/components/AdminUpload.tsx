@@ -1,22 +1,45 @@
 // src/components/AdminUpload.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../assets/AdminUpload.module.css';
+
+interface Category {
+  _id: string;
+  name: string;
+}
 
 interface GameData {
   title: string;
   description: string;
   icon: File | null;
   zipFile: File | null;
+  categories: string[];
 }
 
 export default function AdminUpload() {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [gameData, setGameData] = useState<GameData>({
-    title: '', description: '', icon: null, zipFile: null,
+    title: '', description: '', icon: null, zipFile: null, categories: [],
   });
 
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
 
   const isFormValid = gameData.title.trim() !== '' && gameData.description.trim() !== '' && gameData.icon !== null && gameData.zipFile !== null;
 
@@ -30,6 +53,10 @@ export default function AdminUpload() {
       formData.append('description', gameData.description);
       formData.append('icon', gameData.icon!);
       formData.append('zipFile', gameData.zipFile!);
+      // Append categories as comma-separated string
+      if (gameData.categories.length > 0) {
+        formData.append('categories', gameData.categories.join(','));
+      }
 
       const response = await fetch('/api/games', {
         method: 'POST',
@@ -38,12 +65,16 @@ export default function AdminUpload() {
 
       if (response.ok) {
         setMessage({ text: 'Game uploaded successfully!', type: 'success' });
-        setGameData({ title: '', description: '', icon: null, zipFile: null });
+        setGameData({ title: '', description: '', icon: null, zipFile: null, categories: [] });
       } else {
-        throw new Error('Upload failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
       }
-    } catch (error) {
-      setMessage({ text: 'Failed to upload game. Please try again.', type: 'error' });
+    } catch (error: any) {
+      setMessage({ 
+        text: error.message || 'Failed to upload game. Please try again.', 
+        type: 'error' 
+      });
     } finally {
       setIsUploading(false);
     }
@@ -118,6 +149,62 @@ export default function AdminUpload() {
                 {gameData.zipFile?.name || 'Choose file'}
               </label>
             </div>
+          </div>
+
+          <div className={styles.group}>
+            <label className={styles.label}>Categories (Select multiple):</label>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', 
+              gap: '0.5rem',
+              marginTop: '0.5rem'
+            }}>
+              {categories.map(category => (
+                <label 
+                  key={category._id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    cursor: 'pointer',
+                    padding: '0.5rem',
+                    background: gameData.categories.includes(category._id) 
+                      ? 'rgba(168, 85, 247, 0.3)' 
+                      : 'rgba(255, 255, 255, 0.05)',
+                    border: `1px solid ${gameData.categories.includes(category._id) 
+                      ? 'rgba(168, 85, 247, 0.5)' 
+                      : 'rgba(255, 255, 255, 0.1)'}`,
+                    borderRadius: '6px',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={gameData.categories.includes(category._id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setGameData({
+                          ...gameData,
+                          categories: [...gameData.categories, category._id]
+                        });
+                      } else {
+                        setGameData({
+                          ...gameData,
+                          categories: gameData.categories.filter(id => id !== category._id)
+                        });
+                      }
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <span style={{ color: '#fff', fontSize: '0.9rem' }}>{category.name}</span>
+                </label>
+              ))}
+            </div>
+            {categories.length === 0 && (
+              <p style={{ color: '#b0b0b0', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                No categories available. <Link to="/categories" style={{ color: '#a855f7' }}>Create categories first</Link>
+              </p>
+            )}
           </div>
 
           <button type="submit" className={styles.submitBtn} disabled={!isFormValid || isUploading}>

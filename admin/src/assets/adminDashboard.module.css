@@ -7,8 +7,10 @@
 
 .header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   margin-bottom: 2rem;
   padding: 1rem;
   background: rgba(0, 0, 0, 0.4);
@@ -19,8 +21,10 @@
 
 .headerActions {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .title {
@@ -33,15 +37,16 @@
 }
 
 .uploadBtn {
-  padding: 8px 20px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 20px);
   background: linear-gradient(45deg, #a855f7, #9333ea);
   color: white;
   text-decoration: none;
   border-radius: 20px;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+  white-space: nowrap;
 }
 
 .uploadBtn:hover {
@@ -51,16 +56,17 @@
 }
 
 .logoutBtn {
-  padding: 8px 20px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 20px);
   background: linear-gradient(45deg, #dc2626, #b91c1c);
   color: white;
   border: none;
   border-radius: 20px;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+  white-space: nowrap;
 }
 
 .logoutBtn:hover {
@@ -69,15 +75,16 @@
 }
 
 .usersBtn {
-  padding: 8px 20px;
+  padding: clamp(6px, 1.5vw, 8px) clamp(12px, 3vw, 20px);
   background: linear-gradient(45deg, #3b82f6, #2563eb);
   color: white;
   text-decoration: none;
   border-radius: 20px;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  white-space: nowrap;
 }
 
 .usersBtn:hover {
@@ -115,8 +122,10 @@
 }
 
 .icon {
-  width: 60px;
-  height: 60px;
+  width: clamp(50px, 12vw, 60px);
+  height: clamp(50px, 12vw, 60px);
+  min-width: 50px;
+  min-height: 50px;
   border-radius: 0.75rem;
   object-fit: cover;
   border: 2px solid rgba(168, 85, 247, 0.3);
@@ -143,6 +152,10 @@
   font-size: 0.85rem;
   line-height: 1.4;
   opacity: 0.9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .deleteBtn {
@@ -226,28 +239,99 @@
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .headerActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
 @media (max-width: 768px) {
   .page { padding: 1.5rem 3%; }
-  .header { padding: 0.8rem; }
+  .header { 
+    padding: 0.8rem; 
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .headerActions {
+    width: 100%;
+    gap: 0.5rem;
+  }
   .grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.8rem; }
   .card { padding: 0.8rem; }
-  .content { gap: 0.8rem; }
+  .content { 
+    gap: 0.8rem; 
+    flex-wrap: wrap;
+  }
+  .actions {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 480px) {
   .page { padding: 1rem 2%; }
-  .header { padding: 0.6rem; }
-  .grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.6rem; }
+  .header { 
+    padding: 0.6rem; 
+    flex-direction: column;
+  }
+  .title {
+    font-size: clamp(1.2rem, 5vw, 1.4rem);
+    margin-bottom: 0.5rem;
+  }
+  .headerActions {
+    width: 100%;
+    gap: 0.4rem;
+  }
+  .grid { grid-template-columns: 1fr; gap: 0.6rem; }
   .card { padding: 0.6rem; }
-  .content { gap: 0.6rem; }
+  .content { 
+    gap: 0.6rem; 
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .actions {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .popup {
+    max-width: 95%;
+    padding: 1.5rem;
+  }
 }
 
 @media (max-width: 320px) {
   .page { padding: 0.8rem 1.5%; }
-  .header { padding: 0.5rem; }
+  .header { 
+    padding: 0.5rem; 
+    flex-direction: column;
+  }
+  .headerActions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .uploadBtn, .logoutBtn, .usersBtn {
+    width: 100%;
+    text-align: center;
+  }
   .grid { grid-template-columns: 1fr; gap: 0.5rem; }
   .card { padding: 0.5rem; }
   .content { gap: 0.5rem; }
+  .popup {
+    padding: 1rem;
+  }
+  .popupButtons {
+    flex-direction: column;
+  }
+  .cancelBtn, .confirmBtn {
+    width: 100%;
+  }
 }
 
 .overlay {
@@ -268,9 +352,11 @@
   backdrop-filter: blur(20px);
   border: 1px solid rgba(168, 85, 247, 0.3);
   border-radius: 1.5rem;
-  padding: 2rem;
+  padding: clamp(1rem, 4vw, 2rem);
   max-width: 400px;
   width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
 }
 

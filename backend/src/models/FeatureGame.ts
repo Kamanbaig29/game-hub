@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IFeatureGame extends Document {
   gameId: mongoose.Types.ObjectId;
-  tag: 'hot' | 'new' | 'trending' | 'updated';
+  tagId: mongoose.Types.ObjectId;
   position: number; // 1-6
   createdAt: Date;
   updatedAt: Date;
@@ -14,9 +14,9 @@ const FeatureGameSchema: Schema = new Schema({
     ref: 'Game',
     required: true
   },
-  tag: {
-    type: String,
-    enum: ['hot', 'new', 'trending', 'updated'],
+  tagId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Tag',
     required: true
   },
   position: {

@@ -7,6 +7,8 @@ import gameRoutes from './routes/gameRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import featureGameRoutes from './routes/featureGameRoutes.js';
+import tagRoutes from './routes/tagRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -67,6 +69,8 @@ app.use('/api/games', gameRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/feature-games', featureGameRoutes);
+app.use('/api/tags', tagRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // Static files
 app.use(express.static(path.join(__dirname, '../../dist')));

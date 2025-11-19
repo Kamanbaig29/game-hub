@@ -1,6 +1,7 @@
 import express from 'express';
 import FeatureGame from '../models/FeatureGame.js';
 import Game from '../models/Game.js';
+import Tag from '../models/Tag.js';
 
 const router = express.Router();
 
@@ -9,6 +10,7 @@ router.get('/', async (req, res) => {
   try {
     const featureGames = await FeatureGame.find({})
       .populate('gameId')
+      .populate('tagId')
       .sort({ position: 1 });
     res.json(featureGames);
   } catch (error) {
@@ -24,6 +26,7 @@ router.get('/active', async (req, res) => {
         path: 'gameId',
         match: { isActive: true }
       })
+      .populate('tagId')
       .sort({ position: 1 });
     
     // Filter out null gameIds (inactive games)
@@ -37,14 +40,10 @@ router.get('/active', async (req, res) => {
 // Create or update feature game
 router.post('/', async (req, res) => {
   try {
-    const { gameId, tag, position } = req.body;
+    const { gameId, tagId, position } = req.body;
 
-    if (!gameId || !tag || !position) {
-      return res.status(400).json({ error: 'gameId, tag, and position are required' });
-    }
-
-    if (!['hot', 'new', 'trending', 'updated'].includes(tag)) {
-      return res.status(400).json({ error: 'Tag must be hot, new, trending, or updated' });
+    if (!gameId || !tagId || !position) {
+      return res.status(400).json({ error: 'gameId, tagId, and position are required' });
     }
 
     if (position < 1 || position > 6) {
@@ -57,19 +56,28 @@ router.post('/', async (req, res) => {
       return res.status(404).json({ error: 'Game not found' });
     }
 
-    // Check if position is already taken
-    const existingFeature = await FeatureGame.findOne({ position });
-    if (existingFeature && req.body._id && String(existingFeature._id) !== req.body._id) {
-      return res.status(400).json({ error: `Position ${position} is already taken` });
+    // Check if tag exists
+    const tag = await Tag.findById(tagId);
+    if (!tag) {
+      return res.status(404).json({ error: 'Tag not found' });
     }
 
-    // If _id is provided, update existing feature game
+    // Check if position is already taken
+    const existingFeature = await FeatureGame.findOne({ position });
+    
+    // If _id is provided, we're updating an existing feature game
     if (req.body._id) {
+      // If position is taken by a different feature game, reject
+      if (existingFeature && String(existingFeature._id) !== req.body._id) {
+        return res.status(400).json({ error: `Position ${position} is already taken` });
+      }
+      
+      // Update existing feature game
       const featureGame = await FeatureGame.findByIdAndUpdate(
         req.body._id,
-        { gameId, tag, position },
+        { gameId, tagId, position },
         { new: true, runValidators: true }
-      ).populate('gameId');
+      ).populate('gameId').populate('tagId');
       
       if (!featureGame) {
         return res.status(404).json({ error: 'Feature game not found' });
@@ -77,10 +85,16 @@ router.post('/', async (req, res) => {
       return res.json(featureGame);
     }
 
+    // Creating new feature game - check if position is already taken
+    if (existingFeature) {
+      return res.status(400).json({ error: `Position ${position} is already taken` });
+    }
+
     // Create new feature game
-    const featureGame = new FeatureGame({ gameId, tag, position });
+    const featureGame = new FeatureGame({ gameId, tagId, position });
     await featureGame.save();
     await featureGame.populate('gameId');
+    await featureGame.populate('tagId');
     res.status(201).json(featureGame);
   } catch (error: any) {
     if (error.code === 11000) {
@@ -93,14 +107,10 @@ router.post('/', async (req, res) => {
 // Update feature game
 router.put('/:id', async (req, res) => {
   try {
-    const { gameId, tag, position } = req.body;
+    const { gameId, tagId, position } = req.body;
 
-    if (!gameId || !tag || !position) {
-      return res.status(400).json({ error: 'gameId, tag, and position are required' });
-    }
-
-    if (!['hot', 'new', 'trending', 'updated'].includes(tag)) {
-      return res.status(400).json({ error: 'Tag must be hot, new, trending, or updated' });
+    if (!gameId || !tagId || !position) {
+      return res.status(400).json({ error: 'gameId, tagId, and position are required' });
     }
 
     if (position < 1 || position > 6) {
@@ -113,6 +123,12 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Game not found' });
     }
 
+    // Check if tag exists
+    const tag = await Tag.findById(tagId);
+    if (!tag) {
+      return res.status(404).json({ error: 'Tag not found' });
+    }
+
     // Check if position is already taken by another feature game
     const existingFeature = await FeatureGame.findOne({ position });
     if (existingFeature && String(existingFeature._id) !== req.params.id) {
@@ -121,9 +137,9 @@ router.put('/:id', async (req, res) => {
 
     const featureGame = await FeatureGame.findByIdAndUpdate(
       req.params.id,
-      { gameId, tag, position },
+      { gameId, tagId, position },
       { new: true, runValidators: true }
-    ).populate('gameId');
+    ).populate('gameId').populate('tagId');
 
     if (!featureGame) {
       return res.status(404).json({ error: 'Feature game not found' });
