@@ -9,6 +9,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import featureGameRoutes from './routes/featureGameRoutes.js';
 import tagRoutes from './routes/tagRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
+import comingSoonRoutes from './routes/comingSoonRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -71,6 +72,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/feature-games', featureGameRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/coming-soon', comingSoonRoutes);
 
 // Static files
 app.use(express.static(path.join(__dirname, '../../dist')));

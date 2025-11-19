@@ -218,6 +218,9 @@ export default function AdminDashboard() {
           <Link to="/categories" className={styles.uploadBtn}>
             Categories
           </Link>
+          <Link to="/coming-soon" className={styles.uploadBtn}>
+            Coming Soon
+          </Link>
           {userRole === 'super-admin' && (
             <Link to="/users" className={styles.usersBtn}>
               Manage Users

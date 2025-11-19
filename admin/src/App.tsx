@@ -6,6 +6,7 @@ import UserManagement from './components/UserManagement';
 import AdminFeatureGames from './components/AdminFeatureGames';
 import AdminTags from './components/AdminTags';
 import AdminCategories from './components/AdminCategories';
+import AdminComingSoon from './components/AdminComingSoon';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/feature-games" element={<ProtectedRoute><AdminFeatureGames /></ProtectedRoute>} />
         <Route path="/tags" element={<ProtectedRoute><AdminTags /></ProtectedRoute>} />
         <Route path="/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
+        <Route path="/coming-soon" element={<ProtectedRoute><AdminComingSoon /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
