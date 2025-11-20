@@ -18,6 +18,7 @@ interface Tag {
 
 interface Game {
   _id: string;
+  slug?: string;
   title: string;
   iconPath: string;
   description: string;

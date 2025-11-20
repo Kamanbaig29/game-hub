@@ -18,7 +18,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Library />} />
               <Route path="/arena" element={<Arena />} />
-              <Route path="/game/:id" element={<GameView />} />
+              <Route path="/game/:slug" element={<GameView />} />
               <Route path="/about" element={<About />} />
               <Route path="/privacy" element={<Privacy />} />
             </Routes>

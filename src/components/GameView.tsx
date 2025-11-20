@@ -6,6 +6,7 @@ import styles from '../assets/about.module.css';
 
 interface Game {
   _id: string;
+  slug: string;
   title: string;
   description: string;
   iconPath: string;
@@ -14,7 +15,7 @@ interface Game {
 }
 
 export default function GameView() {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -27,18 +28,26 @@ export default function GameView() {
 
   useEffect(() => {
     fetchGame();
-  }, [id]);
+  }, [slug]);
 
   const fetchGame = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/games`);
+      if (!slug) return;
+      
+      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/api/games/${slug}`);
       if (response.ok) {
-        const games = await response.json();
-        const foundGame = games.find((g: Game) => g._id === id && g.isActive);
-        setGame(foundGame || null);
+        const foundGame = await response.json();
+        if (foundGame.isActive) {
+          setGame(foundGame);
+        } else {
+          setGame(null);
+        }
+      } else {
+        setGame(null);
       }
     } catch (error) {
       console.error('Failed to fetch game:', error);
+      setGame(null);
     } finally {
       setLoading(false);
     }

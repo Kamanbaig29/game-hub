@@ -8,6 +8,7 @@ interface Category {
 
 interface Game {
     _id: string;
+    slug?: string;
     title?: string;
     name?: string; // For coming soon games
     iconPath: string;
@@ -73,7 +74,7 @@ export default function GameCard({ game, badge, isComingSoon = false }: GameCard
     }
 
     return (
-        <Link to={`/game/${game._id}`} className={styles.cardLink}>
+        <Link to={`/game/${game.slug || game._id}`} className={styles.cardLink}>
             <CardContent />
         </Link>
     );

@@ -6,6 +6,7 @@ import AdmZip from 'adm-zip';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
 import Game from '../models/Game.js';
+import { generateUniqueSlug } from '../utils/slugGenerator.js';
 
 const router = express.Router();
 
@@ -114,8 +115,14 @@ router.post('/', upload.fields([
       }
     }
 
+    // Generate unique slug from title
+    const existingGames = await Game.find({}, 'slug');
+    const existingSlugs = existingGames.map(g => g.slug).filter(Boolean);
+    const slug = generateUniqueSlug(req.body.title, existingSlugs);
+
     const gameData: any = {
       title: req.body.title,
+      slug: slug,
       description: req.body.description,
       iconPath: files.icon[0].path,
       zipFilePath: actualBuildPath,
@@ -170,10 +177,19 @@ router.post('/', upload.fields([
   }
 });
 
-// Get single game by ID
-router.get('/:id', async (req, res) => {
+// Get single game by slug or ID (for backward compatibility)
+router.get('/:identifier', async (req, res) => {
   try {
-    const game = await Game.findById(req.params.id).populate('categories');
+    const identifier = req.params.identifier;
+    
+    // Try to find by slug first, then by ID for backward compatibility
+    let game = await Game.findOne({ slug: identifier }).populate('categories');
+    
+    // If not found by slug and identifier looks like MongoDB ObjectId, try by ID
+    if (!game && mongoose.Types.ObjectId.isValid(identifier)) {
+      game = await Game.findById(identifier).populate('categories');
+    }
+    
     if (!game) {
       return res.status(404).json({ error: 'Game not found' });
     }
@@ -263,7 +279,16 @@ router.put('/:id', upload.fields([
 
     // Update title and description
     if (req.body.title) {
-      game.title = req.body.title.trim();
+      const newTitle = req.body.title.trim();
+      const oldTitle = game.title;
+      game.title = newTitle;
+      
+      // Regenerate slug if title changed
+      if (newTitle !== oldTitle) {
+        const existingGames = await Game.find({ _id: { $ne: req.params.id } }, 'slug');
+        const existingSlugs = existingGames.map(g => g.slug).filter(Boolean);
+        game.slug = generateUniqueSlug(newTitle, existingSlugs);
+      }
     }
     if (req.body.description) {
       game.description = req.body.description.trim();

@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IGame extends Document {
   title: string;
+  slug: string;
   description: string;
   iconPath: string;
   zipFilePath: string;
@@ -17,6 +18,14 @@ const GameSchema: Schema = new Schema({
     required: true,
     trim: true,
     unique: true
+  },
+  slug: {
+    type: String,
+    required: false, // Optional for backward compatibility, will be populated by migration
+    trim: true,
+    unique: true,
+    sparse: true, // Allows multiple null/undefined values
+    lowercase: true
   },
   description: {
     type: String,
