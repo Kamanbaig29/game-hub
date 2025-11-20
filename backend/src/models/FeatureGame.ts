@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IFeatureGame extends Document {
   gameId: mongoose.Types.ObjectId;
   tagId: mongoose.Types.ObjectId;
-  position: number; // 1-6
+  position: number; // Dynamic position number (1, 2, 3, ...)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,7 +23,6 @@ const FeatureGameSchema: Schema = new Schema({
     type: Number,
     required: true,
     min: 1,
-    max: 6,
     unique: true
   }
 }, {

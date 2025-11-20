@@ -169,13 +169,24 @@
   padding: 0 20px;
   position: relative;
   z-index: 2;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Library Feature Section */
 .libraryFeatureSection {
-  padding: 80px 0 60px;
+  padding: 20px 0 60px;
   position: relative;
   z-index: 2;
+  overflow: visible;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  /* Break out of container constraints to use full viewport width */
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .libraryFeatureHeader {
@@ -199,12 +210,133 @@
   line-height: 1.6;
 }
 
+.libraryFeatureContainer {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden; /* Ensure arrows stay within bounds */
+}
+
+@media (max-width: 767px) {
+  .libraryFeatureContainer {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+}
+
 .libraryFeatureGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  display: flex;
   gap: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  padding: 10px 0; /* No padding - arrows will overlay */
+  scrollbar-width: none; /* Firefox - hide scrollbar */
+  -ms-overflow-style: none; /* IE and Edge - hide scrollbar */
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  position: relative;
+  min-width: 0; /* Allow flex item to shrink below content size */
+  box-sizing: border-box;
+  flex-shrink: 1; /* Allow grid to shrink */
+  margin: 0; /* Ensure no margin conflicts */
+}
+
+.libraryFeatureGrid::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera - hide scrollbar */
+}
+
+.libraryFeatureGrid .card {
+  min-width: 150px;
+  max-width: 150px;
+  flex-shrink: 0;
+}
+
+.scrollArrow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 15; /* Higher z-index to overlay on games */
+  width: 80px;
+  border: none;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, background 0.2s ease;
+  opacity: 0;
+  pointer-events: none; /* Don't interfere with scrolling when hidden */
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  max-width: 100%; /* Ensure arrows don't exceed container width */
+}
+
+.scrollArrow.visible {
+  opacity: 1;
+  pointer-events: auto; /* Enable clicks when visible */
+}
+
+.scrollArrow:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.scrollArrow:focus-visible {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.scrollArrowLeft {
+  left: 0;
+  border-radius: 0 12px 12px 0;
+}
+
+.scrollArrowRight {
+  right: 0;
+  border-radius: 12px 0 0 12px;
+}
+
+.scrollArrow:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Ensure arrows don't overflow on smaller screens */
+@media (max-width: 1024px) {
+  .scrollArrow {
+    width: 60px;
+  }
+  
+  .libraryFeatureGrid {
+    padding: 10px 0; /* No padding - arrows overlay */
+  }
+  
+  .scrollArrow svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.scrollArrow:active {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.scrollArrow svg {
+  width: 32px;
+  height: 32px;
+  transition: transform 0.2s ease;
+}
+
+.scrollArrow:hover svg {
+  transform: scale(1.2);
 }
 
 .libraryFeatureCardLink {
@@ -277,10 +409,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.8;
     transform: scale(1.05);
@@ -573,19 +708,40 @@
 
 /* Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .libraryFeatureSection {
-    padding: 60px 0 40px;
+    padding: 20px 0 40px;
   }
 
   .libraryFeatureGrid {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 15px;
+    padding: 10px 60px; /* Ensure padding matches arrow width on mobile */
+  }
+
+  .libraryFeatureGrid .card {
+    min-width: 130px;
+    max-width: 130px;
+  }
+
+  .scrollArrow {
+    width: 60px;
+  }
+
+  .scrollArrow svg {
+    width: 28px;
+    height: 28px;
   }
 
   .libraryFeatureCard {
@@ -668,7 +824,7 @@
 
 @media (max-width: 480px) {
   .libraryFeatureSection {
-    padding: 40px 0 30px;
+    padding: 20px 0 30px;
   }
 
   .libraryFeatureHeader {
@@ -676,8 +832,21 @@
   }
 
   .libraryFeatureGrid {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 12px;
+  }
+
+  .libraryFeatureGrid .card {
+    min-width: 100px;
+    max-width: 100px;
+  }
+
+  .scrollArrow {
+    width: 50px;
+  }
+
+  .scrollArrow svg {
+    width: 24px;
+    height: 24px;
   }
 
   .libraryFeatureContent {
@@ -814,5 +983,112 @@
 @media (max-width: 320px) {
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  }
+}
+
+/* Game Card Additions */
+.cardWrapper {
+  display: block;
+  height: 100%;
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+}
+
+.comingSoonOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.comingSoonOverlay span {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 16px;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  position: absolute;
+  transition: opacity 0.3s ease;
+}
+
+.comingSoonTitle {
+  opacity: 1;
+}
+
+.comingSoonText {
+  opacity: 0;
+}
+
+.comingSoonOverlay:hover .comingSoonTitle {
+  opacity: 0;
+}
+
+.comingSoonOverlay:hover .comingSoonText {
+  opacity: 1;
+}
+
+.categories {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.categoryTag {
+  font-size: 0.65rem;
+  color: #b0b0b0;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Category Section Styles */
+.categorySection {
+  margin-bottom: 60px;
+}
+
+.categoryTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 20px;
+  padding-left: 10px;
+  border-left: 4px solid #14f195;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .categoryGrid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 15px;
+  }
+
+  .categoryTitle {
+    font-size: 1.3rem;
   }
 }

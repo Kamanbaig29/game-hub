@@ -46,8 +46,8 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'gameId, tagId, and position are required' });
     }
 
-    if (position < 1 || position > 6) {
-      return res.status(400).json({ error: 'Position must be between 1 and 6' });
+    if (position < 1) {
+      return res.status(400).json({ error: 'Position must be at least 1' });
     }
 
     // Check if game exists
@@ -113,8 +113,8 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'gameId, tagId, and position are required' });
     }
 
-    if (position < 1 || position > 6) {
-      return res.status(400).json({ error: 'Position must be between 1 and 6' });
+    if (position < 1) {
+      return res.status(400).json({ error: 'Position must be at least 1' });
     }
 
     // Check if game exists
@@ -171,8 +171,8 @@ router.delete('/:id', async (req, res) => {
 router.delete('/position/:position', async (req, res) => {
   try {
     const position = parseInt(req.params.position);
-    if (position < 1 || position > 6) {
-      return res.status(400).json({ error: 'Position must be between 1 and 6' });
+    if (position < 1) {
+      return res.status(400).json({ error: 'Position must be at least 1' });
     }
     const featureGame = await FeatureGame.findOneAndDelete({ position });
     if (!featureGame) {
