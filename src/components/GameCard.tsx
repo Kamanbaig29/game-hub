@@ -56,8 +56,8 @@ export default function GameCard({ game, badge, isComingSoon = false }: GameCard
                 <h3 className={styles.gameTitle}>{gameTitle}</h3>
                 {!isComingSoon && game.categories && game.categories.length > 0 && (
                     <div className={styles.categories}>
-                        {game.categories.slice(0, 2).map(cat => (
-                            <span key={cat._id} className={styles.categoryTag}>{cat.name}</span>
+                        {game.categories.slice(0, 2).map((cat, index) => (
+                            <span key={`${cat._id}-${index}`} className={styles.categoryTag}>{cat.name}</span>
                         ))}
                     </div>
                 )}
