@@ -119,6 +119,10 @@ const Option = ({ Icon, title, path, selected, open, external }: OptionProps) =>
         ? "bg-purple-600/30 text-purple-300 border border-purple-500/50"
         : "text-slate-400 hover:bg-purple-900/20 hover:text-purple-200"
         }`}
+      style={{
+        color: isSelected ? 'rgb(196 181 253)' : 'rgb(148 163 184)',
+        colorScheme: 'dark'
+      }}
     >
       <motion.div
         layout
@@ -133,6 +137,10 @@ const Option = ({ Icon, title, path, selected, open, external }: OptionProps) =>
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.125 }}
+          style={{ 
+            color: 'inherit',
+            colorScheme: 'dark'
+          }}
         >
           {title}
           {external && <FiExternalLink className="text-[10px]" />}
