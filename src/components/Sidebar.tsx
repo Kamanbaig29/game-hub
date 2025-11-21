@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import {
   FiChevronDown,
-  FiChevronsRight,
   FiHome,
   FiZap,
   FiInfo,
@@ -33,30 +32,18 @@ interface TitleSectionProps {
 interface LogoProps {
   open: boolean;
 }
-
-interface ToggleCloseProps {
-  open: boolean;
-  setOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
-}
-
 const Sidebar = ({ children }: SidebarProps) => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false); // Default closed
   const location = useLocation();
 
-  // Set default state based on screen size
-  useEffect(() => {
-    const checkScreenSize = () => {
-      const isMobile = window.innerWidth < 768; // md breakpoint
-      setOpen(!isMobile);
-    };
+  // Handle hover to open/close sidebar
+  const handleMouseEnter = () => {
+    setOpen(true);
+  };
 
-    // Check on mount
-    checkScreenSize();
-
-    // Listen for resize events
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
+  const handleMouseLeave = () => {
+    setOpen(false);
+  };
 
   const menuItems = [
     { Icon: FiHome, title: "\u2002Library", path: "/" },
@@ -75,6 +62,8 @@ const Sidebar = ({ children }: SidebarProps) => {
           width: open ? "225px" : "fit-content",
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <div className="flex-shrink-0">
           <TitleSection open={open} />
@@ -96,9 +85,7 @@ const Sidebar = ({ children }: SidebarProps) => {
           </div>
         </div>
 
-        <div className="flex-shrink-0">
-          <ToggleClose open={open} setOpen={setOpen} />
-        </div>
+
       </motion.nav>
       <div
         className="flex-1 transition-all duration-300"
@@ -129,8 +116,8 @@ const Option = ({ Icon, title, path, selected, open, external }: OptionProps) =>
       layout
       onClick={handleClick}
       className={`relative flex h-10 w-full items-center rounded-md transition-colors outline-none focus:outline-none focus:ring-0 ${isSelected
-          ? "bg-purple-600/30 text-purple-300 border border-purple-500/50"
-          : "text-slate-400 hover:bg-purple-900/20 hover:text-purple-200"
+        ? "bg-purple-600/30 text-purple-300 border border-purple-500/50"
+        : "text-slate-400 hover:bg-purple-900/20 hover:text-purple-200"
         }`}
     >
       <motion.div
@@ -191,36 +178,6 @@ const Logo = ({ open }: LogoProps) => {
   );
 };
 
-const ToggleClose = ({ open, setOpen }: ToggleCloseProps) => {
-  return (
-    <motion.button
-      layout
-      onClick={() => setOpen((pv) => !pv)}
-      className="w-full border-t border-purple-500/30 transition-colors hover:bg-purple-900/20 text-slate-400 outline-none focus:outline-none focus:ring-0"
-    >
-      <div className="flex items-center p-2">
-        <motion.div
-          layout
-          className="grid size-10 place-content-center text-lg"
-        >
-          <FiChevronsRight
-            className={`transition-transform ${open && "rotate-180"}`}
-          />
-        </motion.div>
-        {open && (
-          <motion.span
-            layout
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.125 }}
-            className="text-xs font-medium"
-          >
-            Hide
-          </motion.span>
-        )}
-      </div>
-    </motion.button>
-  );
-};
+
 
 export default Sidebar;
