@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import GameModels from "./GameModels";
 import GameCard from "./GameCard";
 import SectionHeader from "./SectionHeader";
+import Loading from "./Loading";
 import styles from '../assets/about.module.css';
 
 interface Category {
@@ -24,6 +25,7 @@ interface Game {
   description: string;
   categories: Category[];
   isActive: boolean;
+  uploadDate?: string | Date;
 }
 
 interface FeatureGame {
@@ -36,6 +38,7 @@ interface FeatureGame {
 interface ComingSoon {
   _id: string;
   name: string;
+  description?: string;
   iconPath: string;
 }
 
@@ -59,7 +62,14 @@ export default function Library() {
 
         if (gamesRes.ok) {
           const data = await gamesRes.json();
-          setGames(data.filter((g: Game) => g.isActive));
+          const activeGames = data.filter((g: Game) => g.isActive);
+          // Sort by uploadDate (newest first)
+          activeGames.sort((a: Game, b: Game) => {
+            const dateA = a.uploadDate ? new Date(a.uploadDate).getTime() : 0;
+            const dateB = b.uploadDate ? new Date(b.uploadDate).getTime() : 0;
+            return dateB - dateA; // Descending order (newest first)
+          });
+          setGames(activeGames);
         }
         if (featureRes.ok) setFeatureGames(await featureRes.json());
         if (categoriesRes.ok) setCategories(await categoriesRes.json());
@@ -75,11 +85,17 @@ export default function Library() {
     fetchData();
   }, []);
 
-  // Helper to check if a category has active games
+  // Helper to check if a category has active games (sorted by newest first)
   const getGamesByCategory = (categoryId: string) => {
-    return games.filter(game =>
-      game.categories.some(cat => cat._id === categoryId)
-    );
+    return games
+      .filter(game =>
+        game.categories.some(cat => cat._id === categoryId)
+      )
+      .sort((a, b) => {
+        const dateA = a.uploadDate ? new Date(a.uploadDate).getTime() : 0;
+        const dateB = b.uploadDate ? new Date(b.uploadDate).getTime() : 0;
+        return dateB - dateA; // Descending order (newest first)
+      });
   };
 
   const activeCategories = categories.filter(cat => getGamesByCategory(cat._id).length > 0);
@@ -87,32 +103,31 @@ export default function Library() {
 
 
   return (
-    <div className={styles.aboutPage}>
-      {/* Background Models */}
-      <div className={styles.backgroundModels}>
-        <GameModels type="blockchain" className={styles.model1} />
-        <GameModels type="crypto" className={styles.model2} />
-        <GameModels type="web3" className={styles.model3} />
-        <GameModels type="nft" className={styles.model4} />
-        <GameModels type="solana" className={styles.model5} />
-        <GameModels type="token" className={styles.model6} />
-        <GameModels type="wallet" className={styles.model7} />
-        <GameModels type="gamepad" className={styles.model8} />
-        <GameModels type="dice" className={styles.model9} />
-        <GameModels type="coin" className={styles.model10} />
-        <GameModels type="trophy" className={styles.model11} />
-        <GameModels type="controller" className={styles.model12} />
-        <GameModels type="headset" className={styles.model13} />
-        <GameModels type="keyboard" className={styles.model14} />
-        <GameModels type="mouse" className={styles.model15} />
-        <GameModels type="joystick" className={styles.model16} />
-      </div>
+    <>
+      <Loading loading={loading} />
+      {!loading && (
+        <div className={styles.aboutPage}>
+          {/* Background Models */}
+          <div className={styles.backgroundModels}>
+            <GameModels type="blockchain" className={styles.model1} />
+            <GameModels type="crypto" className={styles.model2} />
+            <GameModels type="web3" className={styles.model3} />
+            <GameModels type="nft" className={styles.model4} />
+            <GameModels type="solana" className={styles.model5} />
+            <GameModels type="token" className={styles.model6} />
+            <GameModels type="wallet" className={styles.model7} />
+            <GameModels type="gamepad" className={styles.model8} />
+            <GameModels type="dice" className={styles.model9} />
+            <GameModels type="coin" className={styles.model10} />
+            <GameModels type="trophy" className={styles.model11} />
+            <GameModels type="controller" className={styles.model12} />
+            <GameModels type="headset" className={styles.model13} />
+            <GameModels type="keyboard" className={styles.model14} />
+            <GameModels type="mouse" className={styles.model15} />
+            <GameModels type="joystick" className={styles.model16} />
+          </div>
 
-      <div ref={containerRef} className={styles.container}>
-        {loading ? (
-          <div className={styles.loading}>Loading library...</div>
-        ) : (
-          <>
+          <div ref={containerRef} className={styles.container}>
             {/* 1. Featured Games Section */}
             {featureGames.length > 0 && (
               <section className={styles.featuresSection}>
@@ -183,9 +198,9 @@ export default function Library() {
                 ))}
               </div>
             </section>
-          </>
-        )}
-      </div>
-    </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

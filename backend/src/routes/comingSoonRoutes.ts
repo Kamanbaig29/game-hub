@@ -78,6 +78,7 @@ router.post('/', upload.single('icon'), async (req, res) => {
 
     const comingSoon = new ComingSoon({
       name: req.body.name.trim(),
+      description: req.body.description ? req.body.description.trim() : '',
       iconPath: req.file.path
     });
 
@@ -115,6 +116,11 @@ router.put('/:id', upload.single('icon'), async (req, res) => {
     // Update name if provided
     if (req.body.name && req.body.name.trim()) {
       comingSoon.name = req.body.name.trim();
+    }
+
+    // Update description if provided
+    if (req.body.description !== undefined) {
+      comingSoon.description = req.body.description ? req.body.description.trim() : '';
     }
 
     // Update icon if new file uploaded

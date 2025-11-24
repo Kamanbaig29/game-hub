@@ -1117,18 +1117,19 @@
 }
 
 .gameTitle {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 800;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   background: linear-gradient(135deg, #9945ff 0%, #14f195 50%, #e879f9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  line-height: 1.1;
+  line-height: 1.2;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   position: relative;
   display: inline-block;
+  text-align: left;
 }
 
 .gameTitle::after {
@@ -1143,13 +1144,14 @@
 }
 
 .gameDescription {
-  font-size: 1.3rem;
+  font-size: 0.95rem;
   color: #e2e8f0;
-  line-height: 1.7;
-  margin: 0;
+  line-height: 1.6;
+  margin: 0 auto;
   max-width: 800px;
   font-weight: 400;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-align: justify;
 }
 
 .gamesSidebar {
@@ -1348,19 +1350,23 @@
   }
   
   .gameTitle {
-    font-size: clamp(2rem, 6vw, 3rem);
-    margin-bottom: 1.2rem;
-    letter-spacing: 1.5px;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.5px;
+    text-align: left;
   }
   
   .gameTitle::after {
-    width: 50px;
+    width: 40px;
     height: 2px;
-    bottom: -8px;
+    bottom: -6px;
+    left: 0;
   }
   
   .gameDescription {
-    font-size: 1.1rem;
+    font-size: 0.85rem;
+    text-align: justify;
+    margin: 0 auto;
   }
   
   .gamesSidebar {
@@ -1398,18 +1404,23 @@
   }
   
   .gameTitle {
-    margin-bottom: 1rem;
-    letter-spacing: 1px;
+    font-size: clamp(1rem, 3.5vw, 1.5rem);
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.5px;
+    text-align: left;
   }
   
   .gameTitle::after {
-    width: 40px;
+    width: 35px;
     height: 2px;
-    bottom: -6px;
+    bottom: -5px;
+    left: 0;
   }
   
   .gameDescription {
-    font-size: 1rem;
+    font-size: 0.8rem;
+    text-align: justify;
+    margin: 0 auto;
   }
   
   .gamesSidebar {

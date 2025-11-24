@@ -6,6 +6,7 @@ import styles from '../assets/adminDashboard.module.css';
 interface ComingSoon {
   _id: string;
   name: string;
+  description?: string;
   iconPath: string;
   createdAt: string;
   updatedAt: string;
@@ -15,9 +16,10 @@ export default function AdminComingSoon() {
   const [comingSoonGames, setComingSoonGames] = useState<ComingSoon[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<{ name: string; icon: File | null }>({
+  const [formData, setFormData] = useState<{ name: string; description: string; icon: File | null }>({
     name: '',
-    icon: null
+    description: '',  
+    icon: null,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: string; name: string }>({
@@ -49,13 +51,14 @@ export default function AdminComingSoon() {
     setEditingId(game._id);
     setFormData({
       name: game.name,
-      icon: null
+      description: game.description || '',
+      icon: null,
     });
   };
 
   const handleCancel = () => {
     setEditingId(null);
-    setFormData({ name: '', icon: null });
+    setFormData({ name: '', description: '', icon: null });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,6 +78,7 @@ export default function AdminComingSoon() {
     try {
       const submitFormData = new FormData();
       submitFormData.append('name', formData.name.trim());
+      submitFormData.append('description', formData.description.trim());
       if (formData.icon) {
         submitFormData.append('icon', formData.icon);
       }
@@ -205,6 +209,35 @@ export default function AdminComingSoon() {
             />
           </div>
 
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '0.5rem', 
+              color: '#fff', 
+              fontWeight: '500',
+              fontSize: 'clamp(0.9rem, 2vw, 1rem)'
+            }}>
+              Game Description:
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={4}
+              style={{
+                width: '100%',
+                padding: 'clamp(0.6rem, 2vw, 0.75rem)',
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: '1px solid rgba(168, 85, 247, 0.5)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                boxSizing: 'border-box',
+                resize: 'vertical',
+                fontFamily: 'inherit'
+              }}
+              placeholder="Enter game description (optional)..."
+            />
+          </div>
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ 
               display: 'block', 
