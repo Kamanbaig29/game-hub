@@ -104,5 +104,66 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Toggle hide tags from feature section
+router.post('/toggle-hide-section', async (req, res) => {
+  try {
+    const { hideSection } = req.body;
+    
+    if (typeof hideSection !== 'boolean') {
+      return res.status(400).json({ error: 'hideSection must be a boolean' });
+    }
+
+    // Update all tags with the hideSection value
+    const result = await Tag.updateMany({}, { hideSection });
+    
+    res.json({ 
+      message: `Tags ${hideSection ? 'hidden' : 'shown'} from feature section`,
+      hideSection,
+      updatedCount: result.modifiedCount
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to toggle hide tags' });
+  }
+});
+
+// Get hide section status
+router.get('/hide-section-status', async (req, res) => {
+  try {
+    const tag = await Tag.findOne({});
+    const hideSection = tag?.hideSection || false;
+    res.json({ hideSection });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch hide section status' });
+  }
+});
+
+// Toggle hide individual tag
+router.put('/:id/toggle-hide', async (req, res) => {
+  try {
+    const { hideTag } = req.body;
+    
+    if (typeof hideTag !== 'boolean') {
+      return res.status(400).json({ error: 'hideTag must be a boolean' });
+    }
+
+    const tag = await Tag.findByIdAndUpdate(
+      req.params.id,
+      { hideTag },
+      { new: true, runValidators: true }
+    );
+
+    if (!tag) {
+      return res.status(404).json({ error: 'Tag not found' });
+    }
+
+    res.json({ 
+      message: `Tag ${hideTag ? 'hidden' : 'shown'}`,
+      tag
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to toggle hide tag' });
+  }
+});
+
 export default router;
 

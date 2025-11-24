@@ -31,7 +31,50 @@ router.get('/active', async (req, res) => {
     
     // Filter out null gameIds (inactive games)
     const activeFeatureGames = featureGames.filter(fg => fg.gameId !== null);
-    res.json(activeFeatureGames);
+    
+    // Check if section should be hidden (if any feature game has hideSection: true)
+    const isSectionHidden = activeFeatureGames.some(fg => fg.hideSection === true);
+    
+    // If section is hidden, return empty array
+    if (isSectionHidden) {
+      return res.json([]);
+    }
+    
+    // Check if tags should be hidden globally
+    const tag = await Tag.findOne({});
+    const hideTags = tag?.hideSection === true;
+    
+    // Get all tags to check individual hideTag status
+    const allTags = await Tag.find({});
+    const hiddenTagIds = new Set(
+      allTags.filter(t => t.hideTag === true).map(t => {
+        const tagId = t._id as any;
+        return String(tagId);
+      })
+    );
+    
+    // If tags are hidden globally, set tagId to null for all feature games
+    // Otherwise, set tagId to null only for hidden individual tags
+    const result = activeFeatureGames.map(fg => {
+      const fgObj = fg.toObject();
+      
+      if (hideTags) {
+        // Global hide: hide all tags
+        return {
+          ...fgObj,
+          tagId: null
+        };
+      } else if (fgObj.tagId && hiddenTagIds.has(fgObj.tagId._id?.toString() || fgObj.tagId.toString())) {
+        // Individual tag hide: hide only this specific tag
+        return {
+          ...fgObj,
+          tagId: null
+        };
+      }
+      return fgObj;
+    });
+    
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch active feature games' });
   }
@@ -42,8 +85,8 @@ router.post('/', async (req, res) => {
   try {
     const { gameId, tagId, position } = req.body;
 
-    if (!gameId || !tagId || !position) {
-      return res.status(400).json({ error: 'gameId, tagId, and position are required' });
+    if (!gameId || !position) {
+      return res.status(400).json({ error: 'gameId and position are required' });
     }
 
     if (position < 1) {
@@ -56,10 +99,12 @@ router.post('/', async (req, res) => {
       return res.status(404).json({ error: 'Game not found' });
     }
 
-    // Check if tag exists
-    const tag = await Tag.findById(tagId);
-    if (!tag) {
-      return res.status(404).json({ error: 'Tag not found' });
+    // Check if tag exists (only if tagId is provided)
+    if (tagId) {
+      const tag = await Tag.findById(tagId);
+      if (!tag) {
+        return res.status(404).json({ error: 'Tag not found' });
+      }
     }
 
     // Check if position is already taken
@@ -73,9 +118,15 @@ router.post('/', async (req, res) => {
       }
       
       // Update existing feature game
+      const updateData: any = { gameId, position };
+      if (tagId) {
+        updateData.tagId = tagId;
+      } else {
+        updateData.tagId = null;
+      }
       const featureGame = await FeatureGame.findByIdAndUpdate(
         req.body._id,
-        { gameId, tagId, position },
+        updateData,
         { new: true, runValidators: true }
       ).populate('gameId').populate('tagId');
       
@@ -91,7 +142,11 @@ router.post('/', async (req, res) => {
     }
 
     // Create new feature game
-    const featureGame = new FeatureGame({ gameId, tagId, position });
+    const featureGameData: any = { gameId, position };
+    if (tagId) {
+      featureGameData.tagId = tagId;
+    }
+    const featureGame = new FeatureGame(featureGameData);
     await featureGame.save();
     await featureGame.populate('gameId');
     await featureGame.populate('tagId');
@@ -109,8 +164,8 @@ router.put('/:id', async (req, res) => {
   try {
     const { gameId, tagId, position } = req.body;
 
-    if (!gameId || !tagId || !position) {
-      return res.status(400).json({ error: 'gameId, tagId, and position are required' });
+    if (!gameId || !position) {
+      return res.status(400).json({ error: 'gameId and position are required' });
     }
 
     if (position < 1) {
@@ -123,10 +178,12 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Game not found' });
     }
 
-    // Check if tag exists
-    const tag = await Tag.findById(tagId);
-    if (!tag) {
-      return res.status(404).json({ error: 'Tag not found' });
+    // Check if tag exists (only if tagId is provided)
+    if (tagId) {
+      const tag = await Tag.findById(tagId);
+      if (!tag) {
+        return res.status(404).json({ error: 'Tag not found' });
+      }
     }
 
     // Check if position is already taken by another feature game
@@ -135,9 +192,15 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: `Position ${position} is already taken` });
     }
 
+    const updateData: any = { gameId, position };
+    if (tagId) {
+      updateData.tagId = tagId;
+    } else {
+      updateData.tagId = null;
+    }
     const featureGame = await FeatureGame.findByIdAndUpdate(
       req.params.id,
-      { gameId, tagId, position },
+      updateData,
       { new: true, runValidators: true }
     ).populate('gameId').populate('tagId');
 
@@ -181,6 +244,39 @@ router.delete('/position/:position', async (req, res) => {
     res.json({ message: 'Feature game deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete feature game' });
+  }
+});
+
+// Toggle hide section for all feature games
+router.post('/toggle-hide-section', async (req, res) => {
+  try {
+    const { hideSection } = req.body;
+    
+    if (typeof hideSection !== 'boolean') {
+      return res.status(400).json({ error: 'hideSection must be a boolean' });
+    }
+
+    // Update all feature games with the hideSection value
+    const result = await FeatureGame.updateMany({}, { hideSection });
+    
+    res.json({ 
+      message: `Feature section ${hideSection ? 'hidden' : 'shown'}`,
+      hideSection,
+      updatedCount: result.modifiedCount
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to toggle hide section' });
+  }
+});
+
+// Get hide section status
+router.get('/hide-section-status', async (req, res) => {
+  try {
+    const featureGame = await FeatureGame.findOne({});
+    const hideSection = featureGame?.hideSection || false;
+    res.json({ hideSection });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch hide section status' });
   }
 });
 

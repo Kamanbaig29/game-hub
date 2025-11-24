@@ -7,6 +7,7 @@ interface Tag {
   _id: string;
   name: string;
   color: string;
+  hideTag?: boolean;
 }
 
 export default function AdminTags() {
@@ -15,11 +16,26 @@ export default function AdminTags() {
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [formData, setFormData] = useState({ name: '', color: '#9945ff' });
   const [showForm, setShowForm] = useState(false);
+  const [hideSection, setHideSection] = useState(false);
+  const [isTogglingHide, setIsTogglingHide] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchTags();
+    fetchHideSectionStatus();
   }, []);
+
+  const fetchHideSectionStatus = async () => {
+    try {
+      const response = await fetch('/api/tags/hide-section-status');
+      if (response.ok) {
+        const data = await response.json();
+        setHideSection(data.hideSection);
+      }
+    } catch (error) {
+      console.error('Failed to fetch hide section status:', error);
+    }
+  };
 
   const fetchTags = async () => {
     try {
@@ -87,6 +103,35 @@ export default function AdminTags() {
     }
   };
 
+  const handleToggleHideTag = async (tagId: string, currentHideStatus: boolean) => {
+    try {
+      const newHideStatus = !currentHideStatus;
+      const response = await fetch(`/api/tags/${tagId}/toggle-hide`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ hideTag: newHideStatus })
+      });
+
+      if (response.ok) {
+        // Update the tag in the local state
+        setTags(prevTags => 
+          prevTags.map(tag => 
+            tag._id === tagId 
+              ? { ...tag, hideTag: newHideStatus }
+              : tag
+          )
+        );
+      } else {
+        alert('Failed to toggle hide tag');
+      }
+    } catch (error) {
+      console.error('Failed to toggle hide tag:', error);
+      alert('Failed to toggle hide tag');
+    }
+  };
+
   const resetForm = () => {
     setEditingTag(null);
     setFormData({ name: '', color: '#9945ff' });
@@ -96,6 +141,31 @@ export default function AdminTags() {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     navigate('/login');
+  };
+
+  const handleToggleHideSection = async () => {
+    setIsTogglingHide(true);
+    try {
+      const newHideSection = !hideSection;
+      const response = await fetch('/api/tags/toggle-hide-section', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ hideSection: newHideSection })
+      });
+
+      if (response.ok) {
+        setHideSection(newHideSection);
+      } else {
+        alert('Failed to toggle hide tags');
+      }
+    } catch (error) {
+      console.error('Failed to toggle hide tags:', error);
+      alert('Failed to toggle hide tags');
+    } finally {
+      setIsTogglingHide(false);
+    }
   };
 
   return (
@@ -118,7 +188,12 @@ export default function AdminTags() {
         </div>
       </div>
 
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ 
+        marginBottom: '2rem',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem'
+      }}>
         <button
           onClick={() => setShowForm(!showForm)}
           style={{
@@ -129,11 +204,78 @@ export default function AdminTags() {
             borderRadius: '8px',
             cursor: 'pointer',
             fontWeight: '600',
-            fontSize: '1rem'
+            fontSize: '1rem',
+            alignSelf: 'flex-start'
           }}
         >
           {showForm ? 'Cancel' : '+ Add New Tag'}
         </button>
+
+        {/* Hide Tags Toggle */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          padding: '0.75rem',
+          background: tags.length === 0 
+            ? 'rgba(128, 128, 128, 0.1)' 
+            : hideSection 
+              ? 'rgba(255, 68, 68, 0.1)' 
+              : 'rgba(20, 241, 149, 0.1)',
+          borderRadius: '6px',
+          border: `1px solid ${
+            tags.length === 0 
+              ? 'rgba(128, 128, 128, 0.3)' 
+              : hideSection 
+                ? 'rgba(255, 68, 68, 0.3)' 
+                : 'rgba(20, 241, 149, 0.3)'
+          }`,
+          opacity: tags.length === 0 ? 0.6 : 1
+        }}>
+          <input
+            type="checkbox"
+            id="hideTagsSection"
+            checked={hideSection}
+            onChange={handleToggleHideSection}
+            disabled={isTogglingHide || tags.length === 0}
+            style={{
+              width: '20px',
+              height: '20px',
+              cursor: (isTogglingHide || tags.length === 0) ? 'not-allowed' : 'pointer',
+              accentColor: hideSection ? '#ff4444' : '#14f195',
+              opacity: tags.length === 0 ? 0.5 : 1
+            }}
+          />
+          <label 
+            htmlFor="hideTagsSection"
+            style={{
+              color: tags.length === 0 ? '#888' : '#fff',
+              fontSize: '1rem',
+              cursor: (isTogglingHide || tags.length === 0) ? 'not-allowed' : 'pointer',
+              fontWeight: '500',
+              flex: 1
+            }}
+          >
+            {tags.length === 0 
+              ? 'Add at least one tag to enable hide feature'
+              : hideSection 
+                ? 'Tags are Hidden from Feature Section' 
+                : 'Tags are Visible in Feature Section'}
+          </label>
+          {isTogglingHide && (
+            <span style={{ color: '#b0b0b0', fontSize: '0.85rem' }}>Updating...</span>
+          )}
+        </div>
+        {hideSection && tags.length > 0 && (
+          <p style={{
+            color: '#ff9999',
+            margin: 0,
+            fontSize: '0.9rem',
+            fontStyle: 'italic'
+          }}>
+            All tags will be hidden from the feature section on the frontend. Tags will still be visible in the admin panel.
+          </p>
+        )}
       </div>
 
       {showForm && (
@@ -243,70 +385,114 @@ export default function AdminTags() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
           gap: '1rem'
         }}>
-          {tags.map(tag => (
-            <div
-              key={tag._id}
-              style={{
-                background: 'rgba(0, 0, 0, 0.4)',
-                border: '1px solid rgba(168, 85, 247, 0.3)',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '8px',
-                    background: tag.color,
-                    border: '2px solid rgba(255, 255, 255, 0.2)'
-                  }}
-                />
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ color: '#fff', margin: 0, fontSize: '1.2rem', textTransform: 'capitalize' }}>
-                    {tag.name}
-                  </h3>
-                  <p style={{ color: '#b0b0b0', margin: '0.25rem 0 0', fontSize: '0.85rem' }}>
-                    {tag.color}
-                  </p>
+          {tags.map(tag => {
+            const isTagHidden = tag.hideTag === true;
+            const shouldShowOpacity = hideSection || isTagHidden;
+            
+            return (
+              <div
+                key={tag._id}
+                style={{
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  border: '1px solid rgba(168, 85, 247, 0.3)',
+                  borderRadius: '12px',
+                  padding: '1.5rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1rem',
+                  opacity: shouldShowOpacity ? 0.4 : 1,
+                  transition: 'opacity 0.3s ease'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '8px',
+                      background: tag.color,
+                      border: '2px solid rgba(255, 255, 255, 0.2)'
+                    }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ color: '#fff', margin: 0, fontSize: '1.2rem', textTransform: 'capitalize' }}>
+                      {tag.name}
+                    </h3>
+                    <p style={{ color: '#b0b0b0', margin: '0.25rem 0 0', fontSize: '0.85rem' }}>
+                      {tag.color}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Hide Tag Checkbox */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem',
+                  background: isTagHidden ? 'rgba(255, 68, 68, 0.1)' : 'rgba(20, 241, 149, 0.1)',
+                  borderRadius: '6px',
+                  border: `1px solid ${isTagHidden ? 'rgba(255, 68, 68, 0.3)' : 'rgba(20, 241, 149, 0.3)'}`
+                }}>
+                  <input
+                    type="checkbox"
+                    id={`hideTag-${tag._id}`}
+                    checked={isTagHidden}
+                    onChange={() => handleToggleHideTag(tag._id, isTagHidden)}
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      cursor: 'pointer',
+                      accentColor: isTagHidden ? '#ff4444' : '#14f195'
+                    }}
+                  />
+                  <label 
+                    htmlFor={`hideTag-${tag._id}`}
+                    style={{
+                      color: '#fff',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      flex: 1
+                    }}
+                  >
+                    {isTagHidden ? 'Tag Hidden' : 'Tag Visible'}
+                  </label>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    onClick={() => handleEdit(tag)}
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      background: 'rgba(153, 69, 255, 0.3)',
+                      border: '1px solid rgba(153, 69, 255, 0.5)',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(tag._id)}
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      background: 'rgba(255, 68, 68, 0.3)',
+                      border: '1px solid rgba(255, 68, 68, 0.5)',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button
-                  onClick={() => handleEdit(tag)}
-                  style={{
-                    flex: 1,
-                    padding: '0.5rem',
-                    background: 'rgba(153, 69, 255, 0.3)',
-                    border: '1px solid rgba(153, 69, 255, 0.5)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(tag._id)}
-                  style={{
-                    flex: 1,
-                    padding: '0.5rem',
-                    background: 'rgba(255, 68, 68, 0.3)',
-                    border: '1px solid rgba(255, 68, 68, 0.5)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

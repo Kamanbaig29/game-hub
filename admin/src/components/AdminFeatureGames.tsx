@@ -19,7 +19,7 @@ interface Tag {
 interface FeatureGame {
   _id: string;
   gameId: Game;
-  tagId: Tag;
+  tagId: Tag | null;
   position: number;
 }
 
@@ -32,6 +32,8 @@ export default function AdminFeatureGames() {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editForm, setEditForm] = useState<{ gameId: string; tagId: string; position: number } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; featureGame: FeatureGame | null }>({ show: false, featureGame: null });
+  const [hideSection, setHideSection] = useState(false);
+  const [isTogglingHide, setIsTogglingHide] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -39,7 +41,20 @@ export default function AdminFeatureGames() {
     fetchGames();
     fetchTags();
     fetchFeatureGames();
+    fetchHideSectionStatus();
   }, []);
+
+  const fetchHideSectionStatus = async () => {
+    try {
+      const response = await fetch('/api/feature-games/hide-section-status');
+      if (response.ok) {
+        const data = await response.json();
+        setHideSection(data.hideSection);
+      }
+    } catch (error) {
+      console.error('Failed to fetch hide section status:', error);
+    }
+  };
 
   const fetchGames = async () => {
     try {
@@ -70,8 +85,9 @@ export default function AdminFeatureGames() {
       const response = await fetch('/api/feature-games');
       if (response.ok) {
         const data = await response.json();
-        // Filter out feature games with null gameId or tagId (deleted games/tags)
-        const validFeatureGames = data.filter((fg: FeatureGame) => fg.gameId && fg.tagId);
+        // Filter out feature games with null gameId (deleted games)
+        // tagId can be null (None option)
+        const validFeatureGames = data.filter((fg: FeatureGame) => fg.gameId);
         // Sort by position
         validFeatureGames.sort((a: FeatureGame, b: FeatureGame) => a.position - b.position);
         setFeatureGames(validFeatureGames);
@@ -92,7 +108,7 @@ export default function AdminFeatureGames() {
   const handleAddNew = () => {
     setEditForm({
       gameId: games.length > 0 ? games[0]._id : '',
-      tagId: tags.length > 0 ? tags[0]._id : '',
+      tagId: '', // Default to empty (None)
       position: getNextAvailablePosition()
     });
     setIsAddingNew(true);
@@ -106,7 +122,7 @@ export default function AdminFeatureGames() {
   const handleEdit = (featureGame: FeatureGame) => {
     setEditForm({
       gameId: featureGame.gameId._id,
-      tagId: featureGame.tagId._id,
+      tagId: featureGame.tagId ? featureGame.tagId._id : '',
       position: featureGame.position
     });
     setEditingId(featureGame._id);
@@ -118,8 +134,8 @@ export default function AdminFeatureGames() {
   };
 
   const handleSave = async () => {
-    if (!editForm || !editForm.gameId || !editForm.tagId || !editForm.position) {
-      alert('Please fill in all fields');
+    if (!editForm || !editForm.gameId || !editForm.position) {
+      alert('Please fill in game and position');
       return;
     }
 
@@ -131,9 +147,13 @@ export default function AdminFeatureGames() {
     try {
       const body: any = {
         gameId: editForm.gameId,
-        tagId: editForm.tagId,
         position: editForm.position
       };
+      
+      // Only include tagId if it's not empty (None)
+      if (editForm.tagId) {
+        body.tagId = editForm.tagId;
+      }
       
       // Include _id if we're updating an existing feature game
       if (editingId) {
@@ -199,6 +219,31 @@ export default function AdminFeatureGames() {
     setEditForm(null);
   };
 
+  const handleToggleHideSection = async () => {
+    setIsTogglingHide(true);
+    try {
+      const newHideSection = !hideSection;
+      const response = await fetch('/api/feature-games/toggle-hide-section', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ hideSection: newHideSection })
+      });
+
+      if (response.ok) {
+        setHideSection(newHideSection);
+      } else {
+        alert('Failed to toggle hide section');
+      }
+    } catch (error) {
+      console.error('Failed to toggle hide section:', error);
+      alert('Failed to toggle hide section');
+    } finally {
+      setIsTogglingHide(false);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     navigate('/login');
@@ -239,10 +284,75 @@ export default function AdminFeatureGames() {
           color: '#b0b0b0', 
           margin: 0,
           fontSize: 'clamp(0.85rem, 2vw, 1rem)',
-          lineHeight: '1.5'
+          lineHeight: '1.5',
+          marginBottom: '1rem'
         }}>
           Manage featured games displayed on the homepage. Add as many feature games as you want. Each game needs a position number to determine its display order (lower numbers appear first).
         </p>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          padding: '0.75rem',
+          background: featureGames.length === 0 
+            ? 'rgba(128, 128, 128, 0.1)' 
+            : hideSection 
+              ? 'rgba(255, 68, 68, 0.1)' 
+              : 'rgba(20, 241, 149, 0.1)',
+          borderRadius: '6px',
+          border: `1px solid ${
+            featureGames.length === 0 
+              ? 'rgba(128, 128, 128, 0.3)' 
+              : hideSection 
+                ? 'rgba(255, 68, 68, 0.3)' 
+                : 'rgba(20, 241, 149, 0.3)'
+          }`,
+          opacity: featureGames.length === 0 ? 0.6 : 1
+        }}>
+          <input
+            type="checkbox"
+            id="hideSection"
+            checked={hideSection}
+            onChange={handleToggleHideSection}
+            disabled={isTogglingHide || featureGames.length === 0}
+            style={{
+              width: '20px',
+              height: '20px',
+              cursor: (isTogglingHide || featureGames.length === 0) ? 'not-allowed' : 'pointer',
+              accentColor: hideSection ? '#ff4444' : '#14f195',
+              opacity: featureGames.length === 0 ? 0.5 : 1
+            }}
+          />
+          <label 
+            htmlFor="hideSection"
+            style={{
+              color: featureGames.length === 0 ? '#888' : '#fff',
+              fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+              cursor: (isTogglingHide || featureGames.length === 0) ? 'not-allowed' : 'pointer',
+              fontWeight: '500',
+              flex: 1
+            }}
+          >
+            {featureGames.length === 0 
+              ? 'Add at least one game to enable hide feature'
+              : hideSection 
+                ? 'Feature Section is Hidden' 
+                : 'Feature Section is Visible'}
+          </label>
+          {isTogglingHide && (
+            <span style={{ color: '#b0b0b0', fontSize: '0.85rem' }}>Updating...</span>
+          )}
+        </div>
+        {hideSection && (
+          <p style={{
+            color: '#ff9999',
+            margin: '0.5rem 0 0 0',
+            fontSize: 'clamp(0.75rem, 1.8vw, 0.9rem)',
+            fontStyle: 'italic'
+          }}>
+            The entire feature section will be hidden from the frontend. No games will be deleted.
+          </p>
+        )}
       </div>
 
       {loading ? (
@@ -367,7 +477,7 @@ export default function AdminFeatureGames() {
                     fontSize: '0.9rem'
                   }}
                 >
-                  <option value="">-- Select Tag --</option>
+                  <option value="">None (No tag)</option>
                   {tags.map(tag => (
                     <option key={tag._id} value={tag._id}>
                       {tag.name.charAt(0).toUpperCase() + tag.name.slice(1)}
@@ -451,7 +561,9 @@ export default function AdminFeatureGames() {
                       padding: 'clamp(0.5rem, 1.5vw, 0.75rem)',
                       position: 'relative',
                       display: 'flex',
-                      flexDirection: 'column'
+                      flexDirection: 'column',
+                      opacity: hideSection ? 0.4 : 1,
+                      transition: 'opacity 0.3s ease'
                     }}
                   >
                     <div style={{ 
@@ -465,7 +577,7 @@ export default function AdminFeatureGames() {
                       gap: '0.25rem'
                     }}>
                       <span>Pos {featureGame.position}</span>
-                      {!isEditing && (
+                      {!isEditing && featureGame.tagId && (
                         <span style={{
                           padding: '0.2rem 0.4rem',
                           background: getTagColor(featureGame.tagId),
@@ -477,6 +589,20 @@ export default function AdminFeatureGames() {
                           whiteSpace: 'nowrap'
                         }}>
                           {getTagName(featureGame.tagId)}
+                        </span>
+                      )}
+                      {!isEditing && !featureGame.tagId && (
+                        <span style={{
+                          padding: '0.2rem 0.4rem',
+                          background: 'rgba(128, 128, 128, 0.3)',
+                          borderRadius: '6px',
+                          color: '#b0b0b0',
+                          fontSize: 'clamp(0.6rem, 1.2vw, 0.65rem)',
+                          fontWeight: '600',
+                          textTransform: 'uppercase',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          No Tag
                         </span>
                       )}
                     </div>

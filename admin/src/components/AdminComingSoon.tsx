@@ -8,6 +8,7 @@ interface ComingSoon {
   name: string;
   description?: string;
   iconPath: string;
+  hideGame?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,11 +28,26 @@ export default function AdminComingSoon() {
     id: '',
     name: ''
   });
+  const [hideSection, setHideSection] = useState(false);
+  const [isTogglingHide, setIsTogglingHide] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchComingSoonGames();
+    fetchHideSectionStatus();
   }, []);
+
+  const fetchHideSectionStatus = async () => {
+    try {
+      const response = await fetch('/api/coming-soon/hide-section-status');
+      if (response.ok) {
+        const data = await response.json();
+        setHideSection(data.hideSection);
+      }
+    } catch (error) {
+      console.error('Failed to fetch hide section status:', error);
+    }
+  };
 
   const fetchComingSoonGames = async () => {
     try {
@@ -130,6 +146,60 @@ export default function AdminComingSoon() {
     navigate('/login');
   };
 
+  const handleToggleHideSection = async () => {
+    setIsTogglingHide(true);
+    try {
+      const newHideSection = !hideSection;
+      const response = await fetch('/api/coming-soon/toggle-hide-section', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ hideSection: newHideSection })
+      });
+
+      if (response.ok) {
+        setHideSection(newHideSection);
+      } else {
+        alert('Failed to toggle hide section');
+      }
+    } catch (error) {
+      console.error('Failed to toggle hide section:', error);
+      alert('Failed to toggle hide section');
+    } finally {
+      setIsTogglingHide(false);
+    }
+  };
+
+  const handleToggleHideGame = async (gameId: string, currentHideStatus: boolean) => {
+    try {
+      const newHideStatus = !currentHideStatus;
+      const response = await fetch(`/api/coming-soon/${gameId}/toggle-hide`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ hideGame: newHideStatus })
+      });
+
+      if (response.ok) {
+        // Update the game in the local state
+        setComingSoonGames(prevGames => 
+          prevGames.map(game => 
+            game._id === gameId 
+              ? { ...game, hideGame: newHideStatus }
+              : game
+          )
+        );
+      } else {
+        alert('Failed to toggle hide game');
+      }
+    } catch (error) {
+      console.error('Failed to toggle hide game:', error);
+      alert('Failed to toggle hide game');
+    }
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -157,10 +227,75 @@ export default function AdminComingSoon() {
           color: '#b0b0b0', 
           margin: 0,
           fontSize: 'clamp(0.85rem, 2vw, 1rem)',
-          lineHeight: '1.5'
+          lineHeight: '1.5',
+          marginBottom: '1rem'
         }}>
           Manage games that are coming soon. Upload game icons with names to showcase upcoming releases.
         </p>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          padding: '0.75rem',
+          background: comingSoonGames.length === 0 
+            ? 'rgba(128, 128, 128, 0.1)' 
+            : hideSection 
+              ? 'rgba(255, 68, 68, 0.1)' 
+              : 'rgba(20, 241, 149, 0.1)',
+          borderRadius: '6px',
+          border: `1px solid ${
+            comingSoonGames.length === 0 
+              ? 'rgba(128, 128, 128, 0.3)' 
+              : hideSection 
+                ? 'rgba(255, 68, 68, 0.3)' 
+                : 'rgba(20, 241, 149, 0.3)'
+          }`,
+          opacity: comingSoonGames.length === 0 ? 0.6 : 1
+        }}>
+          <input
+            type="checkbox"
+            id="hideSection"
+            checked={hideSection}
+            onChange={handleToggleHideSection}
+            disabled={isTogglingHide || comingSoonGames.length === 0}
+            style={{
+              width: '20px',
+              height: '20px',
+              cursor: (isTogglingHide || comingSoonGames.length === 0) ? 'not-allowed' : 'pointer',
+              accentColor: hideSection ? '#ff4444' : '#14f195',
+              opacity: comingSoonGames.length === 0 ? 0.5 : 1
+            }}
+          />
+          <label 
+            htmlFor="hideSection"
+            style={{
+              color: comingSoonGames.length === 0 ? '#888' : '#fff',
+              fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+              cursor: (isTogglingHide || comingSoonGames.length === 0) ? 'not-allowed' : 'pointer',
+              fontWeight: '500',
+              flex: 1
+            }}
+          >
+            {comingSoonGames.length === 0 
+              ? 'Add at least one game to enable hide feature'
+              : hideSection 
+                ? 'Coming Soon Section is Hidden' 
+                : 'Coming Soon Section is Visible'}
+          </label>
+          {isTogglingHide && (
+            <span style={{ color: '#b0b0b0', fontSize: '0.85rem' }}>Updating...</span>
+          )}
+        </div>
+        {hideSection && comingSoonGames.length > 0 && (
+          <p style={{
+            color: '#ff9999',
+            margin: '0.5rem 0 0 0',
+            fontSize: 'clamp(0.75rem, 1.8vw, 0.9rem)',
+            fontStyle: 'italic'
+          }}>
+            The entire coming soon section will be hidden from the frontend. No games will be deleted.
+          </p>
+        )}
       </div>
 
       {/* Add/Edit Form */}
@@ -337,26 +472,31 @@ export default function AdminComingSoon() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(min(200px, 100%), 1fr))', 
           gap: 'clamp(1rem, 3vw, 1.5rem)'
         }}>
-          {comingSoonGames.map((game) => (
-            <div
-              key={game._id}
-              style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(153, 69, 255, 0.3)',
-                borderRadius: '12px',
-                padding: 'clamp(0.75rem, 2vw, 1rem)',
-                position: 'relative',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.borderColor = 'rgba(153, 69, 255, 0.6)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'rgba(153, 69, 255, 0.3)';
-              }}
-            >
+          {comingSoonGames.map((game) => {
+            const isGameHidden = game.hideGame === true;
+            const shouldShowOpacity = hideSection || isGameHidden;
+            
+            return (
+              <div
+                key={game._id}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(153, 69, 255, 0.3)',
+                  borderRadius: '12px',
+                  padding: 'clamp(0.75rem, 2vw, 1rem)',
+                  position: 'relative',
+                  transition: 'all 0.3s ease',
+                  opacity: shouldShowOpacity ? 0.4 : 1
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.borderColor = 'rgba(153, 69, 255, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.borderColor = 'rgba(153, 69, 255, 0.3)';
+                }}
+              >
               <div style={{ marginBottom: '0.75rem', textAlign: 'center' }}>
                 <img
                   src={`/${game.iconPath.replace(/\\/g, '/')}`}
@@ -380,6 +520,44 @@ export default function AdminComingSoon() {
               }}>
                 {game.name}
               </h3>
+              
+              {/* Hide Game Checkbox */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.5rem',
+                background: isGameHidden ? 'rgba(255, 68, 68, 0.1)' : 'rgba(20, 241, 149, 0.1)',
+                borderRadius: '6px',
+                border: `1px solid ${isGameHidden ? 'rgba(255, 68, 68, 0.3)' : 'rgba(20, 241, 149, 0.3)'}`,
+                marginBottom: '0.5rem'
+              }}>
+                <input
+                  type="checkbox"
+                  id={`hideGame-${game._id}`}
+                  checked={isGameHidden}
+                  onChange={() => handleToggleHideGame(game._id, isGameHidden)}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    cursor: 'pointer',
+                    accentColor: isGameHidden ? '#ff4444' : '#14f195'
+                  }}
+                />
+                <label 
+                  htmlFor={`hideGame-${game._id}`}
+                  style={{
+                    color: '#fff',
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    flex: 1
+                  }}
+                >
+                  {isGameHidden ? 'Game Hidden' : 'Game Visible'}
+                </label>
+              </div>
+
               <div style={{
                 display: 'flex',
                 gap: '0.5rem',
@@ -432,7 +610,8 @@ export default function AdminComingSoon() {
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

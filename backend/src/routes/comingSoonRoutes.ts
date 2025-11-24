@@ -38,13 +38,34 @@ const upload = multer({
   }
 });
 
-// Get all coming soon games
+// Get all coming soon games (for admin - includes hidden)
 router.get('/', async (req, res) => {
   try {
     const comingSoon = await ComingSoon.find({}).sort({ createdAt: -1 });
     res.json(comingSoon);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch coming soon games' });
+  }
+});
+
+// Get active coming soon games (for frontend - filters hidden)
+router.get('/active', async (req, res) => {
+  try {
+    // Check if section should be hidden
+    const anyGame = await ComingSoon.findOne({});
+    const hideSection = anyGame?.hideSection === true;
+    
+    // If section is hidden, return empty array
+    if (hideSection) {
+      return res.json([]);
+    }
+    
+    // Get all games and filter out hidden individual games
+    const comingSoon = await ComingSoon.find({ hideGame: { $ne: true } })
+      .sort({ createdAt: -1 });
+    res.json(comingSoon);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch active coming soon games' });
   }
 });
 
@@ -175,6 +196,67 @@ router.delete('/:id', async (req, res) => {
     res.json({ message: 'Coming soon game deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete coming soon game' });
+  }
+});
+
+// Toggle hide section for all coming soon games
+router.post('/toggle-hide-section', async (req, res) => {
+  try {
+    const { hideSection } = req.body;
+    
+    if (typeof hideSection !== 'boolean') {
+      return res.status(400).json({ error: 'hideSection must be a boolean' });
+    }
+
+    // Update all coming soon games with the hideSection value
+    const result = await ComingSoon.updateMany({}, { hideSection });
+    
+    res.json({ 
+      message: `Coming soon section ${hideSection ? 'hidden' : 'shown'}`,
+      hideSection,
+      updatedCount: result.modifiedCount
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to toggle hide section' });
+  }
+});
+
+// Get hide section status
+router.get('/hide-section-status', async (req, res) => {
+  try {
+    const game = await ComingSoon.findOne({});
+    const hideSection = game?.hideSection || false;
+    res.json({ hideSection });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch hide section status' });
+  }
+});
+
+// Toggle hide individual game
+router.put('/:id/toggle-hide', async (req, res) => {
+  try {
+    const { hideGame } = req.body;
+    
+    if (typeof hideGame !== 'boolean') {
+      return res.status(400).json({ error: 'hideGame must be a boolean' });
+    }
+
+    const game = await ComingSoon.findByIdAndUpdate(
+      req.params.id,
+      { hideGame },
+      { new: true, runValidators: true }
+    );
+
+    if (!game) {
+      return res.status(404).json({ error: 'Coming soon game not found' });
+    }
+
+    res.json({ 
+      message: `Game ${hideGame ? 'hidden' : 'shown'}`,
+      game
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to toggle hide game' });
   }
 });
 

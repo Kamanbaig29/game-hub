@@ -4,6 +4,7 @@ export interface IFeatureGame extends Document {
   gameId: mongoose.Types.ObjectId;
   tagId: mongoose.Types.ObjectId;
   position: number; // Dynamic position number (1, 2, 3, ...)
+  hideSection: boolean; // Hide entire feature section from frontend
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,13 +18,17 @@ const FeatureGameSchema: Schema = new Schema({
   tagId: {
     type: Schema.Types.ObjectId,
     ref: 'Tag',
-    required: true
+    required: false
   },
   position: {
     type: Number,
     required: true,
     min: 1,
     unique: true
+  },
+  hideSection: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

@@ -7,6 +7,7 @@ interface Category {
   _id: string;
   name: string;
   description?: string;
+  hideCategory?: boolean;
 }
 
 export default function AdminCategories() {
@@ -15,11 +16,26 @@ export default function AdminCategories() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [showForm, setShowForm] = useState(false);
+  const [hideSection, setHideSection] = useState(false);
+  const [isTogglingHide, setIsTogglingHide] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchCategories();
+    fetchHideSectionStatus();
   }, []);
+
+  const fetchHideSectionStatus = async () => {
+    try {
+      const response = await fetch('/api/categories/hide-section-status');
+      if (response.ok) {
+        const data = await response.json();
+        setHideSection(data.hideSection);
+      }
+    } catch (error) {
+      console.error('Failed to fetch hide section status:', error);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -98,6 +114,60 @@ export default function AdminCategories() {
     navigate('/login');
   };
 
+  const handleToggleHideSection = async () => {
+    setIsTogglingHide(true);
+    try {
+      const newHideSection = !hideSection;
+      const response = await fetch('/api/categories/toggle-hide-section', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ hideSection: newHideSection })
+      });
+
+      if (response.ok) {
+        setHideSection(newHideSection);
+      } else {
+        alert('Failed to toggle hide section');
+      }
+    } catch (error) {
+      console.error('Failed to toggle hide section:', error);
+      alert('Failed to toggle hide section');
+    } finally {
+      setIsTogglingHide(false);
+    }
+  };
+
+  const handleToggleHideCategory = async (categoryId: string, currentHideStatus: boolean) => {
+    try {
+      const newHideStatus = !currentHideStatus;
+      const response = await fetch(`/api/categories/${categoryId}/toggle-hide`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ hideCategory: newHideStatus })
+      });
+
+      if (response.ok) {
+        // Update the category in the local state
+        setCategories(prevCategories => 
+          prevCategories.map(category => 
+            category._id === categoryId 
+              ? { ...category, hideCategory: newHideStatus }
+              : category
+          )
+        );
+      } else {
+        alert('Failed to toggle hide category');
+      }
+    } catch (error) {
+      console.error('Failed to toggle hide category:', error);
+      alert('Failed to toggle hide category');
+    }
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -118,7 +188,12 @@ export default function AdminCategories() {
         </div>
       </div>
 
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ 
+        marginBottom: '2rem',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem'
+      }}>
         <button
           onClick={() => setShowForm(!showForm)}
           style={{
@@ -129,11 +204,78 @@ export default function AdminCategories() {
             borderRadius: '8px',
             cursor: 'pointer',
             fontWeight: '600',
-            fontSize: '1rem'
+            fontSize: '1rem',
+            alignSelf: 'flex-start'
           }}
         >
           {showForm ? 'Cancel' : '+ Add New Category'}
         </button>
+
+        {/* Hide Categories Toggle */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          padding: '0.75rem',
+          background: categories.length === 0 
+            ? 'rgba(128, 128, 128, 0.1)' 
+            : hideSection 
+              ? 'rgba(255, 68, 68, 0.1)' 
+              : 'rgba(20, 241, 149, 0.1)',
+          borderRadius: '6px',
+          border: `1px solid ${
+            categories.length === 0 
+              ? 'rgba(128, 128, 128, 0.3)' 
+              : hideSection 
+                ? 'rgba(255, 68, 68, 0.3)' 
+                : 'rgba(20, 241, 149, 0.3)'
+          }`,
+          opacity: categories.length === 0 ? 0.6 : 1
+        }}>
+          <input
+            type="checkbox"
+            id="hideSection"
+            checked={hideSection}
+            onChange={handleToggleHideSection}
+            disabled={isTogglingHide || categories.length === 0}
+            style={{
+              width: '20px',
+              height: '20px',
+              cursor: (isTogglingHide || categories.length === 0) ? 'not-allowed' : 'pointer',
+              accentColor: hideSection ? '#ff4444' : '#14f195',
+              opacity: categories.length === 0 ? 0.5 : 1
+            }}
+          />
+          <label 
+            htmlFor="hideSection"
+            style={{
+              color: categories.length === 0 ? '#888' : '#fff',
+              fontSize: '1rem',
+              cursor: (isTogglingHide || categories.length === 0) ? 'not-allowed' : 'pointer',
+              fontWeight: '500',
+              flex: 1
+            }}
+          >
+            {categories.length === 0 
+              ? 'Add at least one category to enable hide feature'
+              : hideSection 
+                ? 'Categories Section is Hidden' 
+                : 'Categories Section is Visible'}
+          </label>
+          {isTogglingHide && (
+            <span style={{ color: '#b0b0b0', fontSize: '0.85rem' }}>Updating...</span>
+          )}
+        </div>
+        {hideSection && categories.length > 0 && (
+          <p style={{
+            color: '#ff9999',
+            margin: 0,
+            fontSize: '0.9rem',
+            fontStyle: 'italic'
+          }}>
+            The entire categories section will be hidden from the frontend. No categories will be deleted.
+          </p>
+        )}
       </div>
 
       {showForm && (
@@ -228,61 +370,105 @@ export default function AdminCategories() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
           gap: '1rem'
         }}>
-          {categories.map(category => (
-            <div
-              key={category._id}
-              style={{
-                background: 'rgba(0, 0, 0, 0.4)',
-                border: '1px solid rgba(168, 85, 247, 0.3)',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem'
-              }}
-            >
-              <div>
-                <h3 style={{ color: '#fff', margin: '0 0 0.5rem', fontSize: '1.2rem' }}>
-                  {category.name}
-                </h3>
-                {category.description && (
-                  <p style={{ color: '#b0b0b0', margin: 0, fontSize: '0.9rem' }}>
-                    {category.description}
-                  </p>
-                )}
+          {categories.map(category => {
+            const isCategoryHidden = category.hideCategory === true;
+            const shouldShowOpacity = hideSection || isCategoryHidden;
+            
+            return (
+              <div
+                key={category._id}
+                style={{
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  border: '1px solid rgba(168, 85, 247, 0.3)',
+                  borderRadius: '12px',
+                  padding: '1.5rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1rem',
+                  opacity: shouldShowOpacity ? 0.4 : 1,
+                  transition: 'opacity 0.3s ease'
+                }}
+              >
+                <div>
+                  <h3 style={{ color: '#fff', margin: '0 0 0.5rem', fontSize: '1.2rem' }}>
+                    {category.name}
+                  </h3>
+                  {category.description && (
+                    <p style={{ color: '#b0b0b0', margin: 0, fontSize: '0.9rem' }}>
+                      {category.description}
+                    </p>
+                  )}
+                </div>
+                
+                {/* Hide Category Checkbox */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem',
+                  background: isCategoryHidden ? 'rgba(255, 68, 68, 0.1)' : 'rgba(20, 241, 149, 0.1)',
+                  borderRadius: '6px',
+                  border: `1px solid ${isCategoryHidden ? 'rgba(255, 68, 68, 0.3)' : 'rgba(20, 241, 149, 0.3)'}`
+                }}>
+                  <input
+                    type="checkbox"
+                    id={`hideCategory-${category._id}`}
+                    checked={isCategoryHidden}
+                    onChange={() => handleToggleHideCategory(category._id, isCategoryHidden)}
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      cursor: 'pointer',
+                      accentColor: isCategoryHidden ? '#ff4444' : '#14f195'
+                    }}
+                  />
+                  <label 
+                    htmlFor={`hideCategory-${category._id}`}
+                    style={{
+                      color: '#fff',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      flex: 1
+                    }}
+                  >
+                    {isCategoryHidden ? 'Category Hidden' : 'Category Visible'}
+                  </label>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    onClick={() => handleEdit(category)}
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      background: 'rgba(153, 69, 255, 0.3)',
+                      border: '1px solid rgba(153, 69, 255, 0.5)',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(category._id)}
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      background: 'rgba(255, 68, 68, 0.3)',
+                      border: '1px solid rgba(255, 68, 68, 0.5)',
+                      borderRadius: '6px',
+                      color: '#fff',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button
-                  onClick={() => handleEdit(category)}
-                  style={{
-                    flex: 1,
-                    padding: '0.5rem',
-                    background: 'rgba(153, 69, 255, 0.3)',
-                    border: '1px solid rgba(153, 69, 255, 0.5)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(category._id)}
-                  style={{
-                    flex: 1,
-                    padding: '0.5rem',
-                    background: 'rgba(255, 68, 68, 0.3)',
-                    border: '1px solid rgba(255, 68, 68, 0.5)',
-                    borderRadius: '6px',
-                    color: '#fff',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

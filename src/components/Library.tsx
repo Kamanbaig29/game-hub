@@ -31,7 +31,7 @@ interface Game {
 interface FeatureGame {
   _id: string;
   gameId: Game;
-  tagId: Tag;
+  tagId: Tag | null;
   position: number;
 }
 
@@ -56,8 +56,8 @@ export default function Library() {
         const [gamesRes, featureRes, categoriesRes, comingSoonRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_BASE_API_URL}/api/games`),
           fetch(`${import.meta.env.VITE_BASE_API_URL}/api/feature-games/active`),
-          fetch(`${import.meta.env.VITE_BASE_API_URL}/api/categories`),
-          fetch(`${import.meta.env.VITE_BASE_API_URL}/api/coming-soon`)
+          fetch(`${import.meta.env.VITE_BASE_API_URL}/api/categories/active`),
+          fetch(`${import.meta.env.VITE_BASE_API_URL}/api/coming-soon/active`)
         ]);
 
         if (gamesRes.ok) {
@@ -140,7 +140,7 @@ export default function Library() {
                     <GameCard
                       key={fg._id}
                       game={fg.gameId}
-                      badge={{ text: fg.tagId.name, color: fg.tagId.color }}
+                      badge={fg.tagId ? { text: fg.tagId.name, color: fg.tagId.color } : undefined}
                     />
                   ))}
                 </div>
