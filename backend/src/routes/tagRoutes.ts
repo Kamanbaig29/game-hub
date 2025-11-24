@@ -13,6 +13,17 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get hide section status (MUST come before /:id route)
+router.get('/hide-section-status', async (req, res) => {
+  try {
+    const tag = await Tag.findOne({});
+    const hideSection = tag?.hideSection || false;
+    res.json({ hideSection });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch hide section status' });
+  }
+});
+
 // Get single tag by ID
 router.get('/:id', async (req, res) => {
   try {
@@ -123,17 +134,6 @@ router.post('/toggle-hide-section', async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to toggle hide tags' });
-  }
-});
-
-// Get hide section status
-router.get('/hide-section-status', async (req, res) => {
-  try {
-    const tag = await Tag.findOne({});
-    const hideSection = tag?.hideSection || false;
-    res.json({ hideSection });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch hide section status' });
   }
 });
 

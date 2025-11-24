@@ -48,6 +48,7 @@ export default function Library() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [comingSoonGames, setComingSoonGames] = useState<ComingSoon[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedComingSoon, setSelectedComingSoon] = useState<ComingSoon | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -100,7 +101,13 @@ export default function Library() {
 
   const activeCategories = categories.filter(cat => getGamesByCategory(cat._id).length > 0);
 
+  const handleComingSoonClick = (game: ComingSoon) => {
+    setSelectedComingSoon(game);
+  };
 
+  const closeModal = () => {
+    setSelectedComingSoon(null);
+  };
 
   return (
     <>
@@ -176,11 +183,16 @@ export default function Library() {
                 />
                 <div className={styles.grid}>
                   {comingSoonGames.map(game => (
-                    <GameCard
+                    <div
                       key={game._id}
-                      game={game as unknown as Game} // Casting because GameCard expects Game interface but we only use icon/title here
-                      isComingSoon={true}
-                    />
+                      onClick={() => handleComingSoonClick(game)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <GameCard
+                        game={game as unknown as Game} // Casting because GameCard expects Game interface but we only use icon/title here
+                        isComingSoon={true}
+                      />
+                    </div>
                   ))}
                 </div>
               </section>
@@ -201,6 +213,193 @@ export default function Library() {
           </div>
         </div>
       )}
+
+      {/* Coming Soon Modal */}
+      {selectedComingSoon && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            padding: '1rem',
+            backdropFilter: 'blur(10px)'
+          }}
+          onClick={closeModal}
+        >
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(50, 20, 80, 0.95) 100%)',
+              border: '2px solid rgba(168, 85, 247, 0.5)',
+              borderRadius: '20px',
+              padding: 'clamp(1rem, 3vw, 1.5rem)',
+              maxWidth: '350px',
+              width: '100%',
+              overflow: 'hidden',
+              boxShadow: '0 20px 60px rgba(147, 51, 234, 0.5)',
+              position: 'relative',
+              animation: 'fadeIn 0.3s ease'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={closeModal}
+              style={{
+                position: 'absolute',
+                top: '0.75rem',
+                right: '0.75rem',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                color: '#fff',
+                cursor: 'pointer',
+                fontSize: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 68, 68, 0.3)';
+                e.currentTarget.style.borderColor = 'rgba(255, 68, 68, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+              }}
+            >
+              ×
+            </button>
+
+            {/* Game Icon */}
+            <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+              <img
+                src={`${import.meta.env.VITE_BASE_API_URL}/${selectedComingSoon.iconPath.replace(/\\/g, '/')}`}
+                alt={selectedComingSoon.name}
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  objectFit: 'contain',
+                  borderRadius: '12px',
+                  boxShadow: '0 8px 20px rgba(147, 51, 234, 0.4)',
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  padding: '0.5rem'
+                }}
+              />
+            </div>
+
+            {/* Game Name */}
+            <h2
+              style={{
+                color: '#e879f9',
+                fontSize: 'clamp(1.1rem, 3vw, 1.3rem)',
+                fontWeight: '700',
+                margin: '0 0 0.75rem 0',
+                textAlign: 'center',
+                textShadow: '0 2px 10px rgba(232, 121, 249, 0.5)'
+              }}
+            >
+              {selectedComingSoon.name}
+            </h2>
+
+            {/* Coming Soon Badge */}
+            <div
+              style={{
+                textAlign: 'center',
+                marginBottom: '1rem'
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  padding: '0.4rem 1rem',
+                  background: 'linear-gradient(135deg, #a855f7, #9333ea)',
+                  color: '#fff',
+                  borderRadius: '20px',
+                  fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
+                  fontWeight: '600',
+                  boxShadow: '0 4px 15px rgba(168, 85, 247, 0.4)'
+                }}
+              >
+                Coming Soon
+              </span>
+            </div>
+
+            {/* Description */}
+            {selectedComingSoon.description && selectedComingSoon.description.trim() && (
+              <div
+                style={{
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  border: '1px solid rgba(168, 85, 247, 0.3)',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  marginTop: '0.75rem'
+                }}
+              >
+                <h3
+                  style={{
+                    color: '#fff',
+                    fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                    fontWeight: '600',
+                    margin: '0 0 0.5rem 0'
+                  }}
+                >
+                  About This Game
+                </h3>
+                <p
+                  style={{
+                    color: '#e2e8f0',
+                    fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
+                    lineHeight: '1.5',
+                    margin: 0,
+                    maxHeight: '150px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {selectedComingSoon.description}
+                </p>
+              </div>
+            )}
+
+            {!selectedComingSoon.description && (
+              <p
+                style={{
+                  color: '#b0b0b0',
+                  fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
+                  textAlign: 'center',
+                  fontStyle: 'italic',
+                  marginTop: '0.75rem'
+                }}
+              >
+                More details coming soon!
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
     </>
   );
 }

@@ -9,7 +9,11 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "create-admin": "tsx src/scripts/createAdmin.ts",
-    "add-slugs": "tsx src/scripts/addSlugsToGames.ts"
+    "add-slugs": "tsx src/scripts/addSlugsToGames.ts",
+    "test:k6": "k6 run k6-tests/all-endpoints.js",
+    "test:k6:moderate": "k6 run k6-tests/moderate-test.js",
+    "test:k6:local": "k6 run -e BASE_URL=http://localhost:5000 -e ADMIN_USERNAME=admin -e ADMIN_PASSWORD=admin123 k6-tests/all-endpoints.js",
+    "test:k6:custom": "k6 run -e BASE_URL=https://cryptoverse.games -e ADMIN_USERNAME=superadmin@admin.com -e ADMIN_PASSWORD=superadmin123 k6-tests/all-endpoints.js"
   },
   "keywords": [],
   "author": "",
