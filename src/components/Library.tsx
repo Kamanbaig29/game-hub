@@ -174,7 +174,20 @@ export default function Library() {
               </section>
             )}
 
-            {/* 3. Coming Soon Section */}
+            {/* 3. All Games Section */}
+            <section className={styles.featuresSection}>
+              <SectionHeader
+                title="All Games"
+                subtitle="Explore our complete collection"
+              />
+              <div className={styles.grid}>
+                {games.map(game => (
+                  <GameCard key={game._id} game={game} />
+                ))}
+              </div>
+            </section>
+
+            {/* 4. Coming Soon Section */}
             {comingSoonGames.length > 0 && (
               <section className={styles.featuresSection}>
                 <SectionHeader
@@ -197,19 +210,6 @@ export default function Library() {
                 </div>
               </section>
             )}
-
-            {/* 4. All Games Section */}
-            <section className={styles.featuresSection}>
-              <SectionHeader
-                title="All Games"
-                subtitle="Explore our complete collection"
-              />
-              <div className={styles.grid}>
-                {games.map(game => (
-                  <GameCard key={game._id} game={game} />
-                ))}
-              </div>
-            </section>
           </div>
         </div>
       )}
