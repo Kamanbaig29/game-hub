@@ -9,6 +9,7 @@ export interface IGame extends Document {
   extractPath: string;
   uploadDate: Date;
   isActive: boolean;
+  orientation?: 'landscape' | 'portrait';
   categories?: mongoose.Types.ObjectId[];
 }
 
@@ -51,6 +52,11 @@ const GameSchema: Schema = new Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  orientation: {
+    type: String,
+    enum: ['landscape', 'portrait'],
+    default: 'landscape'
   },
   categories: [{
     type: Schema.Types.ObjectId,

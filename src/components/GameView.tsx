@@ -19,6 +19,7 @@ interface Game {
   iconPath: string;
   zipFilePath: string;
   isActive: boolean;
+  orientation?: 'landscape' | 'portrait';
   categories?: Category[];
 }
 
@@ -142,7 +143,13 @@ export default function GameView() {
                     {/* Main Content Area */}
                     <div className={styles.gameMainContent}>
                       {/* Game Screen */}
-                      <div className={styles.gameScreen}>
+                      <div className={styles.gameScreen} style={{
+                        aspectRatio: game.orientation === 'portrait' ? '1080/1920' : '1920/1080',
+                        maxWidth: game.orientation === 'portrait' ? '1080px' : '1920px',
+                        maxHeight: game.orientation === 'portrait' ? '1920px' : '1080px',
+                        width: '100%',
+                        height: 'auto'
+                      }}>
                         <iframe
                           src={`${import.meta.env.VITE_BASE_API_URL}/${game.zipFilePath.replace(/\\/g, '/')}/index.html`}
                           title={game.title}

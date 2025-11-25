@@ -126,7 +126,8 @@ router.post('/', upload.fields([
       description: req.body.description,
       iconPath: files.icon[0].path,
       zipFilePath: actualBuildPath,
-      extractPath: extractPath
+      extractPath: extractPath,
+      orientation: req.body.orientation || 'landscape'
     };
 
     if (categoryIds.length > 0) {
@@ -292,6 +293,9 @@ router.put('/:id', upload.fields([
     }
     if (req.body.description) {
       game.description = req.body.description.trim();
+    }
+    if (req.body.orientation) {
+      game.orientation = req.body.orientation;
     }
 
     // Parse categories from request body

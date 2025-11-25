@@ -14,12 +14,13 @@ interface GameData {
   icon: File | null;
   zipFile: File | null;
   categories: string[];
+  orientation: 'landscape' | 'portrait';
 }
 
 export default function AdminUpload() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [gameData, setGameData] = useState<GameData>({
-    title: '', description: '', icon: null, zipFile: null, categories: [],
+    title: '', description: '', icon: null, zipFile: null, categories: [], orientation: 'landscape',
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -53,6 +54,7 @@ export default function AdminUpload() {
       formData.append('description', gameData.description);
       formData.append('icon', gameData.icon!);
       formData.append('zipFile', gameData.zipFile!);
+      formData.append('orientation', gameData.orientation);
       // Append categories as comma-separated string
       if (gameData.categories.length > 0) {
         formData.append('categories', gameData.categories.join(','));
@@ -65,7 +67,7 @@ export default function AdminUpload() {
 
       if (response.ok) {
         setMessage({ text: 'Game uploaded successfully!', type: 'success' });
-        setGameData({ title: '', description: '', icon: null, zipFile: null, categories: [] });
+        setGameData({ title: '', description: '', icon: null, zipFile: null, categories: [], orientation: 'landscape' });
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Upload failed');
@@ -147,6 +149,70 @@ export default function AdminUpload() {
               />
               <label htmlFor="zip" className={styles.fileLabel}>
                 {gameData.zipFile?.name || 'Choose file'}
+              </label>
+            </div>
+          </div>
+
+          <div className={styles.group}>
+            <label className={styles.label}>Game Orientation:</label>
+            <div style={{ 
+              display: 'flex', 
+              gap: '1rem',
+              marginTop: '0.5rem'
+            }}>
+              <label 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  cursor: 'pointer',
+                  padding: '0.75rem 1.5rem',
+                  background: gameData.orientation === 'landscape' 
+                    ? 'rgba(168, 85, 247, 0.3)' 
+                    : 'rgba(255, 255, 255, 0.05)',
+                  border: `1px solid ${gameData.orientation === 'landscape' 
+                    ? 'rgba(168, 85, 247, 0.5)' 
+                    : 'rgba(255, 255, 255, 0.1)'}`,
+                  borderRadius: '6px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <input
+                  type="radio"
+                  name="orientation"
+                  value="landscape"
+                  checked={gameData.orientation === 'landscape'}
+                  onChange={e => setGameData({ ...gameData, orientation: e.target.value as 'landscape' | 'portrait' })}
+                  style={{ cursor: 'pointer' }}
+                />
+                <span style={{ color: '#fff', fontSize: '0.9rem' }}>Landscape (1920×1080)</span>
+              </label>
+              <label 
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  cursor: 'pointer',
+                  padding: '0.75rem 1.5rem',
+                  background: gameData.orientation === 'portrait' 
+                    ? 'rgba(168, 85, 247, 0.3)' 
+                    : 'rgba(255, 255, 255, 0.05)',
+                  border: `1px solid ${gameData.orientation === 'portrait' 
+                    ? 'rgba(168, 85, 247, 0.5)' 
+                    : 'rgba(255, 255, 255, 0.1)'}`,
+                  borderRadius: '6px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <input
+                  type="radio"
+                  name="orientation"
+                  value="portrait"
+                  checked={gameData.orientation === 'portrait'}
+                  onChange={e => setGameData({ ...gameData, orientation: e.target.value as 'landscape' | 'portrait' })}
+                  style={{ cursor: 'pointer' }}
+                />
+                <span style={{ color: '#fff', fontSize: '0.9rem' }}>Portrait (1080×1920)</span>
               </label>
             </div>
           </div>
