@@ -143,25 +143,41 @@ export default function GameView() {
                     {/* Main Content Area */}
                     <div className={styles.gameMainContent}>
                       {/* Game Screen */}
-                      <div className={styles.gameScreen} style={{
-                        aspectRatio: game.orientation === 'portrait' ? '1080/1920' : '1920/1080',
-                        maxWidth: game.orientation === 'portrait' ? '1080px' : '1920px',
-                        maxHeight: game.orientation === 'portrait' ? '1920px' : '1080px',
-                        width: '100%',
-                        height: 'auto'
-                      }}>
-                        <iframe
-                          src={`${import.meta.env.VITE_BASE_API_URL}/${game.zipFilePath.replace(/\\/g, '/')}/index.html`}
-                          title={game.title}
+                      <div 
+                        className={styles.gameScreen}
+                        style={{
+                          backgroundColor: game.orientation === 'portrait' ? '#000000' : undefined,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <div
                           style={{
-                            width: '100%',
-                            height: '100%',
-                            border: 'none',
-                            display: 'block'
+                            width: game.orientation === 'portrait' ? 'auto' : '100%',
+                            height: game.orientation === 'portrait' ? '100%' : '100%',
+                            maxWidth: game.orientation === 'portrait' ? '100%' : '100%',
+                            maxHeight: '100%',
+                            aspectRatio: game.orientation === 'portrait' ? '1080/1920' : undefined,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: 'auto'
                           }}
-                          allow="fullscreen"
-                          loading="lazy"
-                        />
+                        >
+                          <iframe
+                            src={`${import.meta.env.VITE_BASE_API_URL}/${game.zipFilePath.replace(/\\/g, '/')}/index.html`}
+                            title={game.title}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              border: 'none',
+                              display: 'block'
+                            }}
+                            allow="fullscreen"
+                            loading="lazy"
+                          />
+                        </div>
                       </div>
                       
                       {/* Game Info Below Screen */}
